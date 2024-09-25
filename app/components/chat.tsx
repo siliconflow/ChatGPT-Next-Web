@@ -60,6 +60,7 @@ import {
   useAppConfig,
   useChatStore,
   usePluginStore,
+  DEFAULT_CONFIG,
 } from "../store";
 
 import {
@@ -117,6 +118,8 @@ import { ExportMessageModal } from "./exporter";
 import { getClientConfig } from "../config/client";
 import { useAllModels } from "../utils/hooks";
 import { ClientApi, MultimodalContent } from "../client/api";
+import { useCookies } from "react-cookie";
+
 import { createTTSPlayer } from "../utils/audio";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 
@@ -1333,6 +1336,66 @@ function _Chat() {
   const context: RenderMessage[] = useMemo(() => {
     return session.mask.hideContext ? [] : session.mask.context.slice();
   }, [session.mask.context, session.mask.hideContext]);
+
+  const [cookies, setCookie, removeCookie] = useCookies(["sfak"], {
+    doNotParse: true,
+  });
+
+  type ModelInfo = { id: string };
+  const updateCustomModels = async (apiURL: String, token: String) => {
+    const options = {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    };
+    const res = await fetch(
+      `${apiURL}/v1/models?type=text&sub_type=chat`,
+      options,
+    ).then((res) => res.json());
+    const models = res.data as ModelInfo[];
+    config.update((c) => {
+      c.customModels = models
+        .map((m) => m.id)
+        .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+        .join(",");
+    });
+  };
+  const updateDefaultModelConfig = (modelConfig: {
+    model: any;
+    providerName: any;
+  }) => {
+    const FeaturedModel = "deepseek-ai/DeepSeek-R1";
+    if (modelConfig.model == DEFAULT_CONFIG.modelConfig.model) {
+      modelConfig.model = FeaturedModel as ModelType;
+      modelConfig.providerName = FeaturedModel as ServiceProvider;
+    }
+  };
+  useEffect(() => {
+    config.update((config) => {
+      if (accessStore.openaiApiKey) {
+        updateCustomModels(accessStore.openaiUrl, accessStore.openaiApiKey);
+      }
+      updateDefaultModelConfig(config.modelConfig);
+    });
+    const sfakValue = cookies.sfak;
+    if (sfakValue) {
+      const apiURL =
+        process.env.NEXT_PUBLIC_SF_NEXT_CHAT_SF_API_ENDPOINT ||
+        "https://api.siliconflow.cn";
+      chatStore.updateTargetSession(session, (session) => {
+        updateDefaultModelConfig(session.mask.modelConfig);
+      });
+      updateCustomModels(apiURL, sfakValue);
+      accessStore.update((access) => {
+        console.log("update access store with SF API key");
+        access.useCustomConfig = true;
+        access.openaiApiKey = sfakValue;
+        access.deepseekApiKey = sfakValue;
+        access.openaiUrl = apiURL;
+        access.deepseekUrl = apiURL;
+      });
+      removeCookie("sfak");
+    }
+  }, []);
 
   if (
     context.length === 0 &&

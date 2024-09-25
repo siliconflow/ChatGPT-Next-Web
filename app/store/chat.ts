@@ -20,7 +20,6 @@ import {
   DEFAULT_MODELS,
   DEFAULT_SYSTEM_TEMPLATE,
   GEMINI_SUMMARIZE_MODEL,
-  DEEPSEEK_SUMMARIZE_MODEL,
   KnowledgeCutOffDate,
   MCP_SYSTEM_TEMPLATE,
   MCP_TOOLS_TEMPLATE,
@@ -145,7 +144,8 @@ function getSummarizeModel(
   if (currentModel.startsWith("gemini")) {
     return [GEMINI_SUMMARIZE_MODEL, ServiceProvider.Google];
   } else if (currentModel.startsWith("deepseek-")) {
-    return [DEEPSEEK_SUMMARIZE_MODEL, ServiceProvider.DeepSeek];
+    // dirty trick
+    return ["01-ai/Yi-1.5-34B-Chat-16K", ServiceProvider.DeepSeek];
   }
 
   return [currentModel, providerName];

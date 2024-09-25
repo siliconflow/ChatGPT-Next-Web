@@ -55,6 +55,7 @@ export enum Path {
 }
 
 export enum ApiPath {
+  OAuth = "/api/oauth_callback",
   Cors = "",
   Azure = "/api/azure",
   OpenAI = "/api/openai",
@@ -273,7 +274,7 @@ You are ChatGPT, a large language model trained by {{ServiceProvider}}.
 Knowledge cutoff: {{cutoff}}
 Current model: {{model}}
 Current time: {{time}}
-Latex inline: \\(x^2\\) 
+Latex inline: \\(x^2\\)
 Latex block: $$e=mc^2$$
 `;
 
