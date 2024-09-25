@@ -1333,7 +1333,8 @@ function _Chat() {
         access.useCustomConfig = true;
         access.openaiApiKey = sfakValue;
         access.openaiUrl =
-          process.env.NEXT_PUBLIC_SF_NEXT_CHAT_SF_API_ENDPOINT!;
+          process.env.NEXT_PUBLIC_SF_NEXT_CHAT_SF_API_ENDPOINT ||
+          "https://api.siliconflow.cn";
       });
       removeCookie("sfak");
     }
