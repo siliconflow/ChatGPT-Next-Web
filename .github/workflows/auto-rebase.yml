@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0  # Fetch all history for all branches and tags
 
       - name: Add upstream remote
-        run: git remote add upstream https://github.com/comfyanonymous/ComfyUI.git
+        run: git remote add upstream https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web.git
 
       - name: Fetch upstream changes
         run: git fetch upstream
