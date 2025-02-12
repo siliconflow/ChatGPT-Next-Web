@@ -48,6 +48,8 @@ import PluginIcon from "../icons/plugin.svg";
 import ShortcutkeyIcon from "../icons/shortcutkey.svg";
 import McpToolIcon from "../icons/tool.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
+import ProIcon from "../icons/lightning.svg";
+import ThinkIcon from "../icons/brain.svg";
 import {
   BOT_HELLO,
   ChatMessage,
@@ -117,6 +119,7 @@ import { ExportMessageModal } from "./exporter";
 import { getClientConfig } from "../config/client";
 import { useAllModels } from "../utils/hooks";
 import { ClientApi, MultimodalContent } from "../client/api";
+
 import { createTTSPlayer } from "../utils/audio";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "../utils/ms_edge_tts";
 
@@ -199,6 +202,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
                 maskStore.create(session.mask);
               }, 500);
             }}
+            hidden
           />,
         ]}
       >
@@ -219,6 +223,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
                 className="copyable"
                 title={`${Locale.Memory.Title} (${session.lastSummarizeIndex} of ${session.messages.length})`}
                 subTitle={session.memoryPrompt || Locale.Memory.EmptyContent}
+                hidden
               ></ListItem>
             ) : (
               <></>
@@ -405,6 +410,7 @@ export function ChatAction(props: {
   text: string;
   icon: JSX.Element;
   onClick: () => void;
+  hidden?: boolean;
 }) {
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -412,7 +418,9 @@ export function ChatAction(props: {
     full: 16,
     icon: 16,
   });
-
+  if (props.hidden) {
+    return <></>;
+  }
   function updateWidth() {
     if (!iconRef.current || !textRef.current) return;
     const getWidth = (dom: HTMLDivElement) => dom.getBoundingClientRect().width;
@@ -433,6 +441,60 @@ export function ChatAction(props: {
       }}
       onMouseEnter={updateWidth}
       onTouchStart={updateWidth}
+      style={
+        {
+          "--icon-width": `${width.icon}px`,
+          "--full-width": `${width.full}px`,
+        } as React.CSSProperties
+      }
+    >
+      <div ref={iconRef} className={styles["icon"]}>
+        {props.icon}
+      </div>
+      <div className={styles["text"]} ref={textRef}>
+        {props.text}
+      </div>
+    </div>
+  );
+}
+
+export function ChatActionFull(props: {
+  text: string;
+  icon: JSX.Element;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const iconRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState({
+    full: 16,
+    icon: 16,
+  });
+  function updateWidth() {
+    if (!iconRef.current || !textRef.current) return;
+    const getWidth = (dom: HTMLDivElement) => dom.getBoundingClientRect().width;
+    const textWidth = getWidth(textRef.current);
+    const iconWidth = getWidth(iconRef.current);
+    setWidth({
+      full: textWidth + iconWidth,
+      icon: iconWidth,
+    });
+  }
+  useEffect(updateWidth, []);
+
+  return (
+    <div
+      className={clsx(
+        styles["pro-chat-input-action"],
+        "clickable",
+        props.active ? styles["active"] : "",
+      )}
+      onClick={() => {
+        props.onClick();
+        setTimeout(updateWidth, 1);
+      }}
+      // onMouseEnter={updateWidth}
+      // onTouchStart={updateWidth}
       style={
         {
           "--icon-width": `${width.icon}px`,
@@ -570,12 +632,13 @@ export function ChatActions(props: {
   const isMobileScreen = useMobileScreen();
 
   useEffect(() => {
-    const show = isVisionModel(currentModel);
-    setShowUploadImage(show);
-    if (!show) {
-      props.setAttachImages([]);
-      props.setUploading(false);
-    }
+    // FIXME: there is bug, react will keep updating
+    // const show = isVisionModel(currentModel);
+    // setShowUploadImage(show);
+    // if (!show) {
+    //   props.setAttachImages([]);
+    //   props.setUploading(false);
+    // }
 
     // if current model is not available
     // switch to first available model
@@ -595,7 +658,25 @@ export function ChatActions(props: {
       );
     }
   }, [chatStore, currentModel, models, session]);
-
+  const v3 = "deepseek-ai/DeepSeek-V3";
+  const r1 = "deepseek-ai/DeepSeek-R1";
+  const [isDeepThinking, setDeepThinking] = useState(
+    session.mask.modelConfig.model.toLowerCase().includes("r1"),
+  );
+  const [isPro, setPro] = useState(
+    session.mask.modelConfig.model.toLowerCase().includes("pro"),
+  );
+  const updateModel = (t: boolean, p: boolean) => {
+    chatStore.updateTargetSession(session, (session) => {
+      let m = t ? r1 : v3;
+      m = p ? `Pro/${m}` : m;
+      session.mask.modelConfig.model = m as ModelType;
+      console.log("updateModel", session.mask.modelConfig.model);
+      session.mask.modelConfig.providerName = "SiliconFlow" as ServiceProvider;
+      session.mask.syncGlobalConfig = false;
+      showToast(m);
+    });
+  };
   return (
     <div className={styles["chat-input-actions"]}>
       <>
@@ -606,6 +687,28 @@ export function ChatActions(props: {
             icon={<StopIcon />}
           />
         )}
+        <ChatActionFull
+          icon={<ThinkIcon />}
+          onClick={() => {
+            setDeepThinking((i) => {
+              updateModel(!i, isPro);
+              return !i;
+            });
+          }}
+          text={"深度思考"}
+          active={isDeepThinking}
+        />
+        <ChatActionFull
+          icon={<ProIcon />}
+          onClick={() => {
+            setPro((i) => {
+              updateModel(isDeepThinking, !i);
+              return !i;
+            });
+          }}
+          text={"Pro"}
+          active={isPro}
+        />
         {!props.hitBottom && (
           <ChatAction
             onClick={props.scrollToBottom}
@@ -618,6 +721,7 @@ export function ChatActions(props: {
             onClick={props.showPromptModal}
             text={Locale.Chat.InputActions.Settings}
             icon={<SettingsIcon />}
+            hidden
           />
         )}
 
@@ -648,6 +752,7 @@ export function ChatActions(props: {
           onClick={props.showPromptHints}
           text={Locale.Chat.InputActions.Prompt}
           icon={<PromptIcon />}
+          hidden
         />
 
         <ChatAction
@@ -656,6 +761,7 @@ export function ChatActions(props: {
           }}
           text={Locale.Chat.InputActions.Masks}
           icon={<MaskIcon />}
+          hidden
         />
 
         <ChatAction
@@ -677,6 +783,7 @@ export function ChatActions(props: {
           onClick={() => setShowModelSelector(true)}
           text={currentModelName}
           icon={<RobotIcon />}
+          hidden
         />
 
         {showModelSelector && (
@@ -1284,6 +1391,7 @@ function _Chat() {
   };
 
   const accessStore = useAccessStore();
+
   const [speechStatus, setSpeechStatus] = useState(false);
   const [speechLoading, setSpeechLoading] = useState(false);
 
@@ -1474,11 +1582,13 @@ function _Chat() {
             if (!res) return;
             if (payload.key) {
               accessStore.update(
-                (access) => (access.openaiApiKey = payload.key!),
+                (access) => (access.siliconflowApiKey = payload.key!),
               );
             }
             if (payload.url) {
-              accessStore.update((access) => (access.openaiUrl = payload.url!));
+              accessStore.update(
+                (access) => (access.siliconflowUrl = payload.url!),
+              );
             }
             accessStore.update((access) => (access.useCustomConfig = true));
           });
@@ -1704,7 +1814,7 @@ function _Chat() {
                 "window-header-main-title",
                 styles["chat-body-main-title"],
               )}
-              onClickCapture={() => setIsEditingMessage(true)}
+              // onClickCapture={() => setIsEditingMessage(true)}
             >
               {!session.topic ? DEFAULT_TOPIC : session.topic}
             </div>
@@ -1732,10 +1842,11 @@ function _Chat() {
                   title={Locale.Chat.EditMessage.Title}
                   aria={Locale.Chat.EditMessage.Title}
                   onClick={() => setIsEditingMessage(true)}
+                  hidden
                 />
               </div>
             )}
-            <div className="window-action-button">
+            <div className="window-action-button" hidden>
               <IconButton
                 icon={<ExportIcon />}
                 bordered
@@ -1846,6 +1957,7 @@ function _Chat() {
                                       },
                                     );
                                   }}
+                                  hidden
                                 ></IconButton>
                               </div>
                               {isUser ? (

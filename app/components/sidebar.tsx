@@ -12,10 +12,12 @@ import MaskIcon from "../icons/mask.svg";
 import McpIcon from "../icons/mcp.svg";
 import DragIcon from "../icons/drag.svg";
 import DiscoveryIcon from "../icons/discovery.svg";
+import VerifyIcon from "../icons/verify.svg";
+import TopUpIcon from "../icons/top-up.svg";
 
 import Locale from "../locales";
-
-import { useAppConfig, useChatStore } from "../store";
+import { useCookies } from "react-cookie";
+import { useAccessStore, useAppConfig, useChatStore } from "../store";
 
 import {
   DEFAULT_SIDEBAR_WIDTH,
@@ -24,6 +26,7 @@ import {
   NARROW_SIDEBAR_WIDTH,
   Path,
   REPO_URL,
+  SiliconFlow,
 } from "../constant";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -242,7 +245,11 @@ export function SideBar(props: { className?: string }) {
     };
     checkMcpStatus();
   }, []);
-
+  const accessStore = useAccessStore();
+  const [cookies, setCookie, removeCookie] = useCookies(["sfak"], {
+    doNotParse: true,
+  });
+  const isMobileScreen = useMobileScreen();
   return (
     <SideBarContainer
       onDragStart={onDragStart}
@@ -256,6 +263,33 @@ export function SideBar(props: { className?: string }) {
         shouldNarrow={shouldNarrow}
       >
         <div className={styles["sidebar-header-bar"]}>
+          {/* TODO: if is on mobile, don't redirect, raise popup */}
+          <IconButton
+            icon={<VerifyIcon />}
+            text={"实名认证"}
+            className={styles["sidebar-bar-button"]}
+            onClick={() => {
+              if (isMobileScreen) {
+                alert("请在电脑端进行实名认证");
+                return;
+              }
+              window.open(SiliconFlow.VerificationPath, "_blank");
+            }}
+            shadow
+          />
+          <IconButton
+            icon={<TopUpIcon />}
+            text={"余额充值"}
+            className={styles["sidebar-bar-button"]}
+            onClick={() => {
+              if (isMobileScreen) {
+                alert("请在电脑端进行余额充值");
+                return;
+              }
+              window.open(SiliconFlow.BillPath, "_blank");
+            }}
+            shadow
+          />
           <IconButton
             icon={<MaskIcon />}
             text={shouldNarrow ? undefined : Locale.Mask.Name}
@@ -268,6 +302,7 @@ export function SideBar(props: { className?: string }) {
               }
             }}
             shadow
+            hidden
           />
           {mcpEnabled && (
             <IconButton
@@ -286,6 +321,7 @@ export function SideBar(props: { className?: string }) {
             className={styles["sidebar-bar-button"]}
             onClick={() => setshowDiscoverySelector(true)}
             shadow
+            hidden
           />
         </div>
         {showDiscoverySelector && (
@@ -336,7 +372,7 @@ export function SideBar(props: { className?: string }) {
                 />
               </Link>
             </div>
-            <div className={styles["sidebar-action"]}>
+            <div className={styles["sidebar-action"]} hidden>
               <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
                 <IconButton
                   aria={Locale.Export.MessageFromChatGPT}

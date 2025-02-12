@@ -59,7 +59,11 @@ export function ListItem(props: {
   className?: string;
   onClick?: (e: MouseEvent) => void;
   vertical?: boolean;
+  hidden?: boolean;
 }) {
+  if (props.hidden) {
+    return <></>;
+  }
   return (
     <div
       className={clsx(
@@ -87,7 +91,14 @@ export function ListItem(props: {
   );
 }
 
-export function List(props: { children: React.ReactNode; id?: string }) {
+export function List(props: {
+  children: React.ReactNode;
+  id?: string;
+  hidden?: boolean;
+}) {
+  if (props.hidden) {
+    return <></>;
+  }
   return (
     <div className={styles.list} id={props.id}>
       {props.children}

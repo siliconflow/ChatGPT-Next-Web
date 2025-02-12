@@ -59,6 +59,8 @@ export function useChatCommand(commands: ChatCommands = {}) {
     const desc = Locale.Chat.Commands;
     return Object.keys(commands)
       .filter((c) => c.startsWith(input))
+      .filter((c) => c !== "newm")
+      .filter((c) => c !== "fork")
       .map((c) => ({
         title: desc[c as keyof ChatCommands],
         content: ":" + c,

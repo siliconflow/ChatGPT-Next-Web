@@ -24,6 +24,10 @@ import { createPersistStore } from "../utils/store";
 import { ensure } from "../utils/clone";
 import { DEFAULT_CONFIG } from "./config";
 import { getModelProvider } from "../utils/model";
+import {
+  deleteAPIKeyFromCookies,
+  retrieveAPIKeyFromCookies,
+} from "../client/platforms/siliconflow";
 
 let fetchState = 0; // 0 not fetch, 1 fetching, 2 done
 
@@ -61,7 +65,7 @@ const DEFAULT_SILICONFLOW_URL = isApp
 
 const DEFAULT_ACCESS_STATE = {
   accessCode: "",
-  useCustomConfig: false,
+  useCustomConfig: true,
 
   provider: ServiceProvider.OpenAI,
 
@@ -216,6 +220,7 @@ export const useAccessStore = createPersistStore(
     },
 
     isValidSiliconFlow() {
+      this.fetch();
       return ensure(get(), ["siliconflowApiKey"]);
     },
 
@@ -266,6 +271,11 @@ export const useAccessStore = createPersistStore(
         .then((res: DangerConfig) => {
           console.log("[Config] got config from server", res);
           set(() => ({ ...res }));
+          const sfak = retrieveAPIKeyFromCookies();
+          if (sfak) {
+            set(() => ({ siliconflowApiKey: sfak }));
+            deleteAPIKeyFromCookies();
+          }
         })
         .catch(() => {
           console.error("[Config] failed to fetch config");

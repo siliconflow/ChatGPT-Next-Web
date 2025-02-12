@@ -31,6 +31,7 @@ import {
 import { RequestPayload } from "./openai";
 
 import { fetch } from "@/app/utils/stream";
+import { Cookies } from "react-cookie";
 export interface SiliconFlowListModelResponse {
   object: string;
   data: Array<{
@@ -137,7 +138,7 @@ export class SiliconflowApi implements LLMApi {
       // Use extended timeout for thinking models as they typically require more processing time
       const requestTimeoutId = setTimeout(
         () => controller.abort(),
-        REQUEST_TIMEOUT_MS_FOR_THINKING,
+        REQUEST_TIMEOUT_MS_FOR_THINKING * 2,
       );
 
       if (shouldStream) {
@@ -284,4 +285,15 @@ export class SiliconflowApi implements LLMApi {
       },
     }));
   }
+}
+
+export function retrieveAPIKeyFromCookies() {
+  const cookies = new Cookies();
+  const sfak = cookies.get("sfak");
+  return sfak;
+}
+
+export function deleteAPIKeyFromCookies() {
+  const cookies = new Cookies();
+  cookies.remove("sfak");
 }

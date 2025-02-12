@@ -1,6 +1,5 @@
 import { getClientConfig } from "../config/client";
 import { SubmitKey } from "../store/config";
-import { SAAS_CHAT_UTM_URL } from "@/app/constant";
 
 const isApp = !!getClientConfig()?.isApp;
 
@@ -9,12 +8,9 @@ const cn = {
   Error: {
     Unauthorized: isApp
       ? `😆 对话遇到了一些问题，不用慌:
-       \\ 1️⃣ 想要零配置开箱即用，[点击这里立刻开启对话 🚀](${SAAS_CHAT_UTM_URL})
-       \\ 2️⃣ 如果你想消耗自己的 OpenAI 资源，点击[这里](/#/settings)修改设置 ⚙️`
+       \\ 点击[这里](/#/auth)登录`
       : `😆 对话遇到了一些问题，不用慌:
-       \ 1️⃣ 想要零配置开箱即用，[点击这里立刻开启对话 🚀](${SAAS_CHAT_UTM_URL})
-       \ 2️⃣ 如果你正在使用私有部署版本，点击[这里](/#/auth)输入访问秘钥 🔑
-       \ 3️⃣ 如果你想消耗自己的 OpenAI 资源，点击[这里](/#/settings)修改设置 ⚙️
+       \ 点击[这里](/#/auth)登录 🔑
        `,
   },
   Auth: {
@@ -78,7 +74,7 @@ const cn = {
       },
       Prompt: "快捷指令",
       Masks: "所有面具",
-      Clear: "清除聊天",
+      Clear: "清除上下文",
       Settings: "对话设置",
       UploadImage: "上传图片",
     },
@@ -501,6 +497,8 @@ const cn = {
           Title: "接口密钥",
           SubTitle: "使用自定义硅基流动 API Key",
           Placeholder: "硅基流动 API Key",
+          Authenticate: "登录",
+          Exit: "退出",
         },
         Endpoint: {
           Title: "接口地址",
@@ -621,12 +619,20 @@ const cn = {
   },
   Store: {
     DefaultTopic: "新的聊天",
-    BotHello: "有什么可以帮你的吗",
+    BotHello: "嘿～终于遇到你 😄 欢迎使用 SiliconChat",
     Error: "出错了，稍后重试吧",
     Prompt: {
       History: (content: string) => "这是历史聊天总结作为前情提要：" + content,
-      Topic:
-        "使用四到五个字直接返回这句话的简要主题，不要解释、不要标点、不要语气词、不要多余文本，不要加粗，如果没有主题，请直接返回“闲聊”",
+      Topic: `根据用户的会话内容生成一个会话标题
+内容要求：
+1. 根据用户会话内容的语言选择标题语言
+2. 不要太长，中文**不超过** 5 个汉字，英文不超过 10 个字符
+3. 允许使用 emoji
+4. 内容友善，**不允许**使用任何政治、暴力、色情、宗教等相关的词汇，**不允许**有歧视性表达
+输出规范：
+1. 仅输出标题内容，**不要**有任何多余的字符，**不要**尝试回答任何问题
+2. 当无法总结用户的内容或用户内容过于简短时，直接使用用户输入内容的开头作为标题，同样要符合前述规范
+3. 如果前述要求都无法满足，使用【闲聊】`,
       Summarize:
         "简要总结一下对话内容，用作后续的上下文提示 prompt，控制在 200 字以内",
     },

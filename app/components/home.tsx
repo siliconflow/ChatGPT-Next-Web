@@ -24,12 +24,13 @@ import {
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
-import { AuthPage } from "./auth";
+import { AuthPage, StayPage } from "./auth";
 import { getClientConfig } from "../config/client";
 import { type ClientApi, getClientApi } from "../client/api";
 import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
+import { retrieveAPIKeyFromCookies } from "../client/platforms/siliconflow";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -163,6 +164,7 @@ function Screen() {
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
+  const isStay = location.pathname === Path.Stay;
   const isSd = location.pathname === Path.Sd;
   const isSdNew = location.pathname === Path.SdNew;
 
@@ -172,8 +174,14 @@ function Screen() {
 
   useEffect(() => {
     loadAsyncGoogleFont();
+    return useAccessStore.subscribe((state, prevState) => {
+      if (state.siliconflowApiKey !== prevState.siliconflowApiKey) {
+        console.log("SiliconFlow API Key changed", state.siliconflowApiKey);
+        setHasSetKey(!!state.siliconflowApiKey);
+      }
+    });
   }, []);
-
+  const [hasSetKey, setHasSetKey] = useState<boolean>(false);
   if (isArtifact) {
     return (
       <Routes>
@@ -181,8 +189,18 @@ function Screen() {
       </Routes>
     );
   }
+
   const renderContent = () => {
+    if (isStay) return <StayPage />;
     if (isAuth) return <AuthPage />;
+    if (!useAccessStore.getState().isValidSiliconFlow()) {
+      // if db doesn't have a key, but we have a key in cookies, we should wait
+      if (retrieveAPIKeyFromCookies()) {
+        return <Loading />;
+      }
+      return <AuthPage />;
+    }
+    if (!hasSetKey) return <Loading />;
     if (isSd) return <Sd />;
     if (isSdNew) return <Sd />;
     return (
@@ -242,7 +260,6 @@ export function Home() {
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
     useAccessStore.getState().fetch();
-
     const initMcp = async () => {
       try {
         const enabled = await isMcpEnabled();
