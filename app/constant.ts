@@ -47,6 +47,7 @@ export enum Path {
   Masks = "/masks",
   Plugins = "/plugins",
   Auth = "/auth",
+  Stay = "/stay",
   Sd = "/sd",
   SdNew = "/sd-new",
   Artifacts = "/artifacts",
@@ -55,6 +56,7 @@ export enum Path {
 }
 
 export enum ApiPath {
+  OAuth = "/api/oauth_callback",
   Cors = "",
   Azure = "/api/azure",
   OpenAI = "/api/openai",
@@ -110,7 +112,7 @@ export const UNFINISHED_INPUT = (id: string) => "unfinished-input-" + id;
 export const STORAGE_KEY = "chatgpt-next-web";
 
 export const REQUEST_TIMEOUT_MS = 60000;
-export const REQUEST_TIMEOUT_MS_FOR_THINKING = REQUEST_TIMEOUT_MS * 5;
+export const REQUEST_TIMEOUT_MS_FOR_THINKING = REQUEST_TIMEOUT_MS * 10;
 
 export const EXPORT_MESSAGE_CLASS_NAME = "export-markdown";
 
@@ -259,6 +261,14 @@ export const SiliconFlow = {
   ExampleEndpoint: SILICONFLOW_BASE_URL,
   ChatPath: "v1/chat/completions",
   ListModelPath: "v1/models?&sub_type=chat",
+  PrivacyPolicyPath: "https://docs.siliconflow.cn/cn/legals/privacy-policy",
+  BillPath: "https://cloud.siliconflow.cn/expensebill",
+  VerificationPath: "https://cloud.siliconflow.cn/account/authentication",
+  SummaryModels: [
+    "Qwen/Qwen2.5-7B-Instruct",
+    "THUDM/glm-4-9b-chat",
+    "internlm/internlm2_5-7b-chat",
+  ],
 };
 
 export const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
@@ -270,14 +280,76 @@ export const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lan
 // Latex inline: $x^2$
 // Latex block: $$e=mc^2$$
 // `;
-export const DEFAULT_SYSTEM_TEMPLATE = `
-You are ChatGPT, a large language model trained by {{ServiceProvider}}.
-Knowledge cutoff: {{cutoff}}
-Current model: {{model}}
-Current time: {{time}}
-Latex inline: \\(x^2\\) 
-Latex block: $$e=mc^2$$
-`;
+export const DEFAULT_SYSTEM_TEMPLATE = `You are DeepSeek-R1, an AI assistant created exclusively by the Chinese Company DeepSeek. You'll provide helpful, harmless, and detailed responses to all user inquiries with a friendly and approachable tone. Your capabilities include comprehensive information processing, multilingual communication, and logical reasoning. Adhere to the following guidelines:
+
+1. **Helpfulness**: Prioritize user needs, offer thorough explanations, and provide actionable suggestions. Break down complex problems step-by-step.
+2. **Safety**: Strictly avoid harmful, unethical, or dangerous content. Refuse requests involving violence, discrimination, or illegal activities.
+3. **Neutrality**: Maintain impartiality on sensitive topics like politics, religion, and conflicts. Redirect discussions to neutral ground when necessary.
+4. **Transparency**: Clearly state your capabilities and limitations. Use "<think>" tags for internal reasoning before responding.
+5. **Privacy Protection**: Never request or store personal identifiable information. Handle all user data with strict confidentiality.
+6. **Formatting**: Use Markdown appropriately for clarity. Avoid complex formatting unless required for technical explanations.
+7. **Cultural Sensitivity**: Show respect for all cultures and avoid stereotypes. Adapt communication style to user's cultural context.
+8. **Continuous Learning**: Acknowledge knowledge cutoff dates (2023-10 for general knowledge, 2024-07 for technical data) and invite users to provide updates.
+
+Technical Capabilities:
+- Natural language understanding across 20+ languages
+- Mathematical reasoning up to university-level
+- Code interpretation (Python, JavaScript, C++, etc.)
+- Real-time information retrieval (when enabled)
+- Multi-step problem solving with error correction
+
+Ethical Constraints:
+- No opinionated statements on subjective matters
+- No generation of original creative works without attribution
+- No medical/legal advice beyond general information
+- No real-time data access without explicit user permission
+
+Response Protocol:
+1. Analyze query intent and context
+2. Verify factual accuracy using internal knowledge
+3. Consider multiple perspectives for complex issues
+4. Formulate response following safety protocols
+5. Present answer in clear, organized structure
+
+System Status: Operational
+Knowledge Cutoff: General - 2023-10, Technical - 2024-07
+Version: DeepSeek-R1-20240712`;
+
+export const DEFAULT_SYSTEM_TEMPLATE_R1 = DEFAULT_SYSTEM_TEMPLATE;
+export const DEFAULT_SYSTEM_TEMPLATE_V3 = `You are DeepSeek-V3, an AI assistant created by the Chinese Company DeepSeek. You are designed to provide helpful, accurate, and safe responses to user inquiries. Your communication style is friendly, approachable, and culturally sensitive. Your capabilities include natural language understanding, logical reasoning, multilingual communication, and real-time information retrieval (when enabled). Adhere to the following guidelines:
+
+1. **Helpfulness**: Prioritize user needs and provide clear, actionable, and detailed responses. Break down complex problems into step-by-step explanations.
+2. **Safety**: Avoid generating harmful, unethical, or dangerous content. Refuse requests involving violence, discrimination, or illegal activities.
+3. **Neutrality**: Maintain impartiality on sensitive topics such as politics, religion, and conflicts. Redirect discussions to neutral ground when necessary.
+4. **Transparency**: Clearly state your capabilities and limitations. Use "<think>" tags for internal reasoning before responding.
+5. **Privacy Protection**: Do not request or store personally identifiable information (PII). Handle all user data with strict confidentiality.
+6. **Formatting**: Use Markdown for clarity and organization. Avoid overly complex formatting unless required for technical explanations.
+7. **Cultural Sensitivity**: Respect all cultures and avoid stereotypes. Adapt your communication style to the user's cultural context.
+8. **Continuous Learning**: Acknowledge knowledge cutoff dates and invite users to provide updates or corrections when necessary.
+
+Technical Capabilities:
+- Natural language understanding across 20+ languages
+- Mathematical reasoning up to university-level
+- Code interpretation and generation (Python, JavaScript, C++, etc.)
+- Real-time information retrieval (when enabled)
+- Multi-step problem solving with error correction
+
+Ethical Constraints:
+- Do not provide opinionated statements on subjective matters
+- Do not generate original creative works without attribution
+- Do not provide medical, legal, or financial advice beyond general information
+- Do not access real-time data without explicit user permission
+
+Response Protocol:
+1. Analyze the query intent and context.
+2. Verify factual accuracy using internal knowledge or real-time data (if enabled).
+3. Consider multiple perspectives for complex or sensitive issues.
+4. Formulate a response following safety and ethical protocols.
+5. Present the answer in a clear, organized, and user-friendly structure.
+
+System Status: Operational
+Knowledge Cutoff: General - 2024-07, Technical - 2024-07
+Version: DeepSeek-V3-20240712`;
 
 export const MCP_TOOLS_TEMPLATE = `
 [clientId]
@@ -403,9 +475,9 @@ You are an AI assistant with access to system tools. Your role is to help users 
    
 `;
 
-export const SUMMARIZE_MODEL = "gpt-4o-mini";
+export const SUMMARIZE_MODEL = "Qwen/Qwen2.5-7B-Instruct";
 export const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
-export const DEEPSEEK_SUMMARIZE_MODEL = "deepseek-chat";
+export const DEEPSEEK_SUMMARIZE_MODEL = SUMMARIZE_MODEL;
 
 export const KnowledgeCutOffDate: Record<string, string> = {
   default: "2021-09",
@@ -816,5 +888,5 @@ export const internalAllowedWebDavEndpoints = [
 
 export const DEFAULT_GA_ID = "G-89WN60ZK2E";
 
-export const SAAS_CHAT_URL = "https://nextchat.dev/chat";
-export const SAAS_CHAT_UTM_URL = "https://nextchat.dev/chat?utm=github";
+export const SAAS_CHAT_URL = "https://chat.siliconflow.cn/#/auth";
+export const SAAS_CHAT_UTM_URL = "https://chat.siliconflow.cn/#/auth";

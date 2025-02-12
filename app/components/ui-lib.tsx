@@ -59,7 +59,11 @@ export function ListItem(props: {
   className?: string;
   onClick?: (e: MouseEvent) => void;
   vertical?: boolean;
+  hidden?: boolean;
 }) {
+  if (props.hidden) {
+    return <></>;
+  }
   return (
     <div
       className={clsx(
@@ -87,7 +91,14 @@ export function ListItem(props: {
   );
 }
 
-export function List(props: { children: React.ReactNode; id?: string }) {
+export function List(props: {
+  children: React.ReactNode;
+  id?: string;
+  hidden?: boolean;
+}) {
+  if (props.hidden) {
+    return <></>;
+  }
   return (
     <div className={styles.list} id={props.id}>
       {props.children}
@@ -160,6 +171,50 @@ export function Modal(props: ModalProps) {
             <CloseIcon />
           </div>
         </div>
+      </div>
+
+      <div className={styles["modal-content"]}>{props.children}</div>
+
+      <div className={styles["modal-footer"]}>
+        {props.footer}
+        <div className={styles["modal-actions"]}>
+          {props.actions?.map((action, i) => (
+            <div key={i} className={styles["modal-action"]}>
+              {action}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function BlockerModal(props: ModalProps) {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        props.onClose?.();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [isMax, setMax] = useState(!!props.defaultMax);
+
+  return (
+    <div
+      className={clsx(styles["modal-container"], {
+        [styles["modal-container-max"]]: isMax,
+      })}
+    >
+      <div className={styles["modal-header"]}>
+        <div className={styles["modal-title"]}>{props.title}</div>
       </div>
 
       <div className={styles["modal-content"]}>{props.children}</div>

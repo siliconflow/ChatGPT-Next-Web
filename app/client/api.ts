@@ -11,7 +11,7 @@ import {
   useAccessStore,
   useChatStore,
 } from "../store";
-import { ChatGPTApi, DalleRequestPayload } from "./platforms/openai";
+import { DalleRequestPayload } from "./platforms/openai";
 import { GeminiProApi } from "./platforms/google";
 import { ClaudeApi } from "./platforms/anthropic";
 import { ErnieApi } from "./platforms/baidu";
@@ -169,7 +169,8 @@ export class ClientApi {
         this.llm = new SiliconflowApi();
         break;
       default:
-        this.llm = new ChatGPTApi();
+        this.llm = new SiliconflowApi();
+      // this.llm = new ChatGPTApi();
     }
   }
 

@@ -159,6 +159,7 @@ export function ModelConfigList(props: {
           <ListItem
             title={Locale.Settings.InjectSystemPrompts.Title}
             subTitle={Locale.Settings.InjectSystemPrompts.SubTitle}
+            hidden
           >
             <input
               aria-label={Locale.Settings.InjectSystemPrompts.Title}
@@ -177,6 +178,7 @@ export function ModelConfigList(props: {
           <ListItem
             title={Locale.Settings.InputTemplate.Title}
             subTitle={Locale.Settings.InputTemplate.SubTitle}
+            hidden
           >
             <input
               aria-label={Locale.Settings.InputTemplate.Title}
@@ -194,6 +196,7 @@ export function ModelConfigList(props: {
       <ListItem
         title={Locale.Settings.HistoryCount.Title}
         subTitle={Locale.Settings.HistoryCount.SubTitle}
+        hidden
       >
         <InputRange
           aria={Locale.Settings.HistoryCount.Title}
@@ -213,6 +216,7 @@ export function ModelConfigList(props: {
       <ListItem
         title={Locale.Settings.CompressThreshold.Title}
         subTitle={Locale.Settings.CompressThreshold.SubTitle}
+        hidden
       >
         <input
           aria-label={Locale.Settings.CompressThreshold.Title}
@@ -229,7 +233,11 @@ export function ModelConfigList(props: {
           }
         ></input>
       </ListItem>
-      <ListItem title={Locale.Memory.Title} subTitle={Locale.Memory.Send}>
+      <ListItem
+        title={Locale.Memory.Title}
+        subTitle={Locale.Memory.Send}
+        hidden
+      >
         <input
           aria-label={Locale.Memory.Title}
           type="checkbox"

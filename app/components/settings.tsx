@@ -246,6 +246,7 @@ function UserPromptModal(props: { onClose?: () => void }) {
 function DangerItems() {
   const chatStore = useChatStore();
   const appConfig = useAppConfig();
+  const navigate = useNavigate();
 
   return (
     <List>
@@ -274,6 +275,7 @@ function DangerItems() {
           onClick={async () => {
             if (await showConfirm(Locale.Settings.Danger.Clear.Confirm)) {
               chatStore.clearAllData();
+              navigate(Path.Stay);
             }
           }}
           type="danger"
@@ -510,7 +512,7 @@ function SyncItems() {
 
   return (
     <>
-      <List>
+      <List hidden>
         <ListItem
           title={Locale.Settings.Sync.CloudState}
           subTitle={
@@ -1519,6 +1521,7 @@ export function Settings() {
                 ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
                 : Locale.Settings.Update.IsLatest
             }
+            hidden
           >
             {checkingUpdate ? (
               <LoadingIcon />
@@ -1703,7 +1706,7 @@ export function Settings() {
 
         <SyncItems />
 
-        <List>
+        <List hidden>
           <ListItem
             title={Locale.Settings.Mask.Splash.Title}
             subTitle={Locale.Settings.Mask.Splash.SubTitle}
@@ -1764,6 +1767,7 @@ export function Settings() {
               builtinCount,
               customCount,
             )}
+            hidden
           >
             <IconButton
               aria={Locale.Settings.Prompt.List + Locale.Settings.Prompt.Edit}
@@ -1774,8 +1778,8 @@ export function Settings() {
           </ListItem>
         </List>
 
-        <List id={SlotID.CustomModel}>
-          {saasStartComponent}
+        <List id={SlotID.CustomModel} hidden>
+          {/* {saasStartComponent} */}
           {accessCodeComponent}
 
           {!accessStore.hideUserApiKey && (
@@ -1873,7 +1877,7 @@ export function Settings() {
           </ListItem>
         </List>
 
-        <List>
+        <List hidden>
           <ModelConfigList
             modelConfig={config.modelConfig}
             updateConfig={(updater) => {
@@ -1887,7 +1891,7 @@ export function Settings() {
         {shouldShowPromptModal && (
           <UserPromptModal onClose={() => setShowPromptModal(false)} />
         )}
-        <List>
+        <List hidden>
           <RealtimeConfigList
             realtimeConfig={config.realtimeConfig}
             updateConfig={(updater) => {
@@ -1899,7 +1903,7 @@ export function Settings() {
             }}
           />
         </List>
-        <List>
+        <List hidden>
           <TTSConfigList
             ttsConfig={config.ttsConfig}
             updateConfig={(updater) => {

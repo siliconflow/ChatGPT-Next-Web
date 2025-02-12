@@ -27,6 +27,9 @@ import {
   ServiceProvider,
   StoreKey,
   SUMMARIZE_MODEL,
+  DEFAULT_SYSTEM_TEMPLATE_V3,
+  DEFAULT_SYSTEM_TEMPLATE_R1,
+  SiliconFlow,
 } from "../constant";
 import Locale, { getLang } from "../locales";
 import { prettyObject } from "../utils/format";
@@ -553,13 +556,19 @@ export const useChatStore = createPersistStore(
         const shouldInjectSystemPrompts =
           modelConfig.enableInjectSystemPrompts &&
           (session.mask.modelConfig.model.startsWith("gpt-") ||
-            session.mask.modelConfig.model.startsWith("chatgpt-"));
+            session.mask.modelConfig.model.startsWith("chatgpt-") ||
+            session.mask.modelConfig.model.toLowerCase().includes("deepseek"));
 
         const mcpEnabled = await isMcpEnabled();
         const mcpSystemPrompt = mcpEnabled ? await getMcpSystemPrompt() : "";
 
         var systemPrompts: ChatMessage[] = [];
 
+        let t = DEFAULT_SYSTEM_TEMPLATE;
+        if (session.mask.modelConfig.model.toLowerCase().includes("v3"))
+          t = DEFAULT_SYSTEM_TEMPLATE_V3;
+        if (session.mask.modelConfig.model.toLowerCase().includes("r1"))
+          t = DEFAULT_SYSTEM_TEMPLATE_R1;
         if (shouldInjectSystemPrompts) {
           systemPrompts = [
             createMessage({
@@ -567,7 +576,7 @@ export const useChatStore = createPersistStore(
               content:
                 fillTemplateWith("", {
                   ...modelConfig,
-                  template: DEFAULT_SYSTEM_TEMPLATE,
+                  template: t,
                 }) + mcpSystemPrompt,
             }),
           ];
@@ -670,13 +679,16 @@ export const useChatStore = createPersistStore(
           return;
         }
 
+        const accessStore = useAccessStore.getState();
+        function getRandomModel(models: typeof SiliconFlow.SummaryModels) {
+          const randomIndex = Math.floor(Math.random() * models.length);
+          return models[randomIndex];
+        }
         // if not config compressModel, then using getSummarizeModel
-        const [model, providerName] = modelConfig.compressModel
-          ? [modelConfig.compressModel, modelConfig.compressProviderName]
-          : getSummarizeModel(
-              session.mask.modelConfig.model,
-              session.mask.modelConfig.providerName,
-            );
+        const [model, providerName] = [
+          getRandomModel(SiliconFlow.SummaryModels),
+          ServiceProvider.SiliconFlow,
+        ];
         const api: ClientApi = getClientApi(providerName as ServiceProvider);
 
         // remove error messages if any

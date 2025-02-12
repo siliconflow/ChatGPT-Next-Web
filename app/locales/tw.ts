@@ -74,7 +74,7 @@ const tw = {
       },
       Prompt: "快捷指令",
       Masks: "所有角色範本",
-      Clear: "清除聊天",
+      Clear: "清除上下文",
       Settings: "對話設定",
       UploadImage: "上傳圖片",
     },

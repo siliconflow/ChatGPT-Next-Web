@@ -31,6 +31,7 @@ import {
 import { RequestPayload } from "./openai";
 
 import { fetch } from "@/app/utils/stream";
+import { Cookies } from "react-cookie";
 export interface SiliconFlowListModelResponse {
   object: string;
   data: Array<{
@@ -284,4 +285,15 @@ export class SiliconflowApi implements LLMApi {
       },
     }));
   }
+}
+
+export function retrieveAPIKeyFromCookies() {
+  const cookies = new Cookies();
+  const sfak = cookies.get("sfak");
+  return sfak;
+}
+
+export function deleteAPIKeyFromCookies() {
+  const cookies = new Cookies();
+  cookies.remove("sfak");
 }

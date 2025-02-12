@@ -24,12 +24,14 @@ import {
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
-import { AuthPage } from "./auth";
+import { AuthPage, StayPage } from "./auth";
 import { getClientConfig } from "../config/client";
 import { type ClientApi, getClientApi } from "../client/api";
 import { useAccessStore } from "../store";
 import clsx from "clsx";
 import { initializeMcpSystem, isMcpEnabled } from "../mcp/actions";
+import { retrieveAPIKeyFromCookies } from "../client/platforms/siliconflow";
+import { BlockerModal } from "./ui-lib";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -163,15 +165,24 @@ function Screen() {
   const isArtifact = location.pathname.includes(Path.Artifacts);
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
+  const isStay = location.pathname === Path.Stay;
   const isSd = location.pathname === Path.Sd;
   const isSdNew = location.pathname === Path.SdNew;
 
   const isMobileScreen = useMobileScreen();
   const shouldTightBorder =
     getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
-
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(
+    !useAccessStore.getState().isValidSiliconFlow(),
+  );
   useEffect(() => {
     loadAsyncGoogleFont();
+    return useAccessStore.subscribe((state, prevState) => {
+      if (state.siliconflowApiKey !== prevState.siliconflowApiKey) {
+        console.log("SiliconFlow API Key changed", state.siliconflowApiKey);
+        setShowAuthModal(!state.siliconflowApiKey);
+      }
+    });
   }, []);
 
   if (isArtifact) {
@@ -181,8 +192,24 @@ function Screen() {
       </Routes>
     );
   }
+  function AuthModal(props: {
+    onClose?: () => void;
+    children?: React.ReactNode;
+  }) {
+    return (
+      <div className="modal-mask">
+        <BlockerModal title={""}>{props.children}</BlockerModal>
+      </div>
+    );
+  }
+
   const renderContent = () => {
-    if (isAuth) return <AuthPage />;
+    if (!useAccessStore.getState().isValidSiliconFlow()) {
+      // if db doesn't have a key, but we have a key in cookies, we should wait
+      if (retrieveAPIKeyFromCookies()) {
+        return <Loading />;
+      }
+    }
     if (isSd) return <Sd />;
     if (isSdNew) return <Sd />;
     return (
@@ -192,6 +219,11 @@ function Screen() {
             [styles["sidebar-show"]]: isHome,
           })}
         />
+        {showAuthModal && (
+          <AuthModal onClose={() => {}}>
+            {isStay ? <StayPage /> : <AuthPage />}
+          </AuthModal>
+        )}
         <WindowContent>
           <Routes>
             <Route path={Path.Home} element={<Chat />} />
@@ -242,7 +274,6 @@ export function Home() {
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
     useAccessStore.getState().fetch();
-
     const initMcp = async () => {
       try {
         const enabled = await isMcpEnabled();

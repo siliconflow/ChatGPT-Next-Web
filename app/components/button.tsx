@@ -20,7 +20,11 @@ export function IconButton(props: {
   autoFocus?: boolean;
   style?: CSSProperties;
   aria?: string;
+  hidden?: boolean;
 }) {
+  if (props.hidden) {
+    return <></>;
+  }
   return (
     <button
       className={clsx(

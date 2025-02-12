@@ -2,6 +2,7 @@ import {
   CACHE_URL_PREFIX,
   UPLOAD_URL,
   REQUEST_TIMEOUT_MS,
+  SiliconFlow,
 } from "@/app/constant";
 import { RequestMessage } from "@/app/client/api";
 import Locale from "@/app/locales";
@@ -182,7 +183,7 @@ export function stream(
       responseText += remainText;
       console.log("[Response Animation] finished");
       if (responseText?.length === 0) {
-        options.onError?.(new Error("empty response from server"));
+        options.onError?.(new Error("服务器繁忙"));
       }
       return;
     }
@@ -550,6 +551,12 @@ export function streamWithThink(
           try {
             const resJson = await res.clone().json();
             extraInfo = prettyObject(resJson);
+            if (resJson.code === 30001 || resJson.code === 30011) {
+              extraInfo = `⚠️不好，余额不足了，请先完成充值 👉 [立即充值](${SiliconFlow.BillPath})`;
+            }
+            if (resJson.code === 50603) {
+              extraInfo = `⚠️系统繁忙，请稍后重试`;
+            }
           } catch {}
 
           if (res.status === 401) {

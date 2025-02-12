@@ -12,6 +12,7 @@ RUN yarn config set registry 'https://registry.npmmirror.com/'
 RUN yarn install
 
 FROM base AS builder
+ARG NEXT_PUBLIC_SF_NEXT_CHAT_CLIENT_ID
 
 RUN apk update && apk add --no-cache git
 
