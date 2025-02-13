@@ -27,7 +27,7 @@ const ko: PartialLocaleType = {
     Return: "돌아가기",
     SaasTips: "설정이 너무 복잡합니다. 즉시 사용하고 싶습니다.",
     TopTips:
-      "🥳 NextChat AI 출시 기념 할인, 지금 OpenAI o1, GPT-4o, Claude-3.5 및 최신 대형 모델을 해제하세요",
+      "🥳 SiliconChat AI 출시 기념 할인, 지금 OpenAI o1, GPT-4o, Claude-3.5 및 최신 대형 모델을 해제하세요",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 개의 대화`,
@@ -292,7 +292,7 @@ const ko: PartialLocaleType = {
 
     Access: {
       SaasStart: {
-        Title: "NextChat AI 사용하기",
+        Title: "SiliconChat AI 사용하기",
         Label: "(가장 비용 효율적인 솔루션)",
         SubTitle:
           "NextChat에 의해 공식적으로 유지 관리되며, 제로 구성으로 즉시 사용할 수 있으며, OpenAI o1, GPT-4o, Claude-3.5와 같은 최신 대형 모델을 지원합니다",

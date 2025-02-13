@@ -27,7 +27,7 @@ const tw = {
     Return: "返回",
     SaasTips: "設定太麻煩，想要立即使用",
     TopTips:
-      "🥳 NextChat AI 首發優惠，立刻解鎖 OpenAI o1, GPT-4o, Claude-3.5 等最新的大型語言模型",
+      "🥳 SiliconChat AI 首發優惠，立刻解鎖 OpenAI o1, GPT-4o, Claude-3.5 等最新的大型語言模型",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 則對話`,
@@ -299,10 +299,10 @@ const tw = {
 
     Access: {
       SaasStart: {
-        Title: "使用 NextChat AI",
+        Title: "使用 SiliconChat AI",
         Label: "(性價比最高的方案)",
         SubTitle:
-          "由 NextChat 官方維護，無須設定開箱即用，支援 OpenAI o1、GPT-4o、Claude-3.5 等最新的大型語言模型",
+          "由 SiliconChat 官方維護，無須設定開箱即用，支援 OpenAI o1、GPT-4o、Claude-3.5 等最新的大型語言模型",
         ChatNow: "立刻開始對話",
       },
 
