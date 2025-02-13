@@ -1600,8 +1600,8 @@ function _Chat() {
   });
 
   // edit / insert message modal
-  const [isEditingMessage, setIsEditingMessage] = useState(false);
-
+  const [, setIsEditingMessage] = useState(false);
+  const isEditingMessage = false;
   // remember unfinished input
   useEffect(() => {
     // try to load from local storage
