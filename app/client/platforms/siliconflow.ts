@@ -29,7 +29,6 @@ import {
   getTimeoutMSByModel,
 } from "@/app/utils";
 import { RequestPayload } from "./openai";
-import { getServerSideConfig } from "@/app/config/server";
 import { fetch } from "@/app/utils/stream";
 import { Cookies } from "react-cookie";
 export interface SiliconFlowListModelResponse {
@@ -46,7 +45,6 @@ export class SiliconflowApi implements LLMApi {
 
   path(path: string): string {
     const accessStore = useAccessStore.getState();
-    const serverConfig = getServerSideConfig();
 
     let baseUrl = "";
 
@@ -60,11 +58,6 @@ export class SiliconflowApi implements LLMApi {
       baseUrl = isApp ? SILICONFLOW_BASE_URL : apiPath;
     }
 
-    // Don't proxy if vercel
-    if (serverConfig?.isVercel) {
-      baseUrl = SiliconFlow.ExampleEndpoint;
-    }
-
     if (baseUrl.endsWith("/")) {
       baseUrl = baseUrl.slice(0, baseUrl.length - 1);
     }
@@ -73,6 +66,11 @@ export class SiliconflowApi implements LLMApi {
       !baseUrl.startsWith(ApiPath.SiliconFlow)
     ) {
       baseUrl = "https://" + baseUrl;
+    }
+
+    // If we are building on Vercel, directly access to SiliconFlow API for better performance
+    if (!!getClientConfig()?.isVercelBuild) {
+      baseUrl = SILICONFLOW_BASE_URL;
     }
 
     console.log("[Proxy Endpoint] ", baseUrl, path);
