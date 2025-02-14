@@ -59,9 +59,9 @@ export class SiliconflowApi implements LLMApi {
       baseUrl = isApp ? SILICONFLOW_BASE_URL : apiPath;
     }
 
-    // Always proxy if not vercel
-    if (!getServerSideConfig().isVercel) {
-      baseUrl = ApiPath.SiliconFlow;
+    // Don't proxy if vercel
+    if (getServerSideConfig().isVercel) {
+      baseUrl = SiliconFlow.ExampleEndpoint;
     }
 
     if (baseUrl.endsWith("/")) {
