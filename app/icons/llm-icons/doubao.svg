@@ -1,6 +1,6 @@
 <svg height="1em" style="flex:none;line-height:1" viewBox="0 0 30 30" width="1em" xmlns="http://www.w3.org/2000/svg">
     <title>Doubao</title>
-    <rect width="30" height="30" fill="#E7F8FF" rx="6"/>
+    <rect width="30" height="30" fill="none" rx="6"/>
     <g transform="translate(3, 3)">
         <path d="M5.31 15.756c.172-3.75 1.883-5.999 2.549-6.739-3.26 2.058-5.425 5.658-6.358 8.308v1.12C1.501 21.513 4.226 24 7.59 24a6.59 6.59 0 002.2-.375c.353-.12.7-.248 1.039-.378.913-.899 1.65-1.91 2.243-2.992-4.877 2.431-7.974.072-7.763-4.5l.002.001z"
               fill="#1E37FC"></path>

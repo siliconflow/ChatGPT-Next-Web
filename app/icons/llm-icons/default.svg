@@ -5,7 +5,7 @@
         <rect id="path_1" width="20.455" height="20.455" x="0" y="0"/>
     </defs>
     <g opacity="1" transform="translate(0 0) rotate(0 14.999999999999998 14.999999999999998)">
-        <rect width="30" height="30" x="0" y="0" fill="#E7F8FF" opacity="1" rx="10"
+        <rect width="30" height="30" x="0" y="0" fill="none" opacity="1" rx="10"
               transform="translate(0 0) rotate(0 14.999999999999998 14.999999999999998)"/>
         <mask id="bg-mask-0" fill="#fff">
             <use xlink:href="#path_0"/>

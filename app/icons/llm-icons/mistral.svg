@@ -1,6 +1,6 @@
 <svg height="1em" style="flex:none;line-height:1" viewBox="0 0 30 30" width="1em" xmlns="http://www.w3.org/2000/svg">
     <title>Mistral</title>
-    <rect width="30" height="30" fill="#E7F8FF" rx="6"/>
+    <rect width="30" height="30" fill="none" rx="6"/>
     <g transform="translate(3, 3)">
         <g fill="none" fill-rule="nonzero">
             <path d="M15 6v4h-2V6h2zm4-4v4h-2V2h2zM3 2H1h2zM1 2h2v20H1V2zm8 12h2v4H9v-4zm8 0h2v8h-2v-8z"

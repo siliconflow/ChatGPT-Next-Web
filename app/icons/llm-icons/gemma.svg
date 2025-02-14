@@ -1,6 +1,6 @@
 <svg height="1em" style="flex:none;line-height:1" viewBox="0 0 30 30" width="1em" xmlns="http://www.w3.org/2000/svg">
     <title>Gemma</title>
-    <rect width="30" height="30" fill="#E7F8FF" rx="6"/>
+    <rect width="30" height="30" fill="none" rx="6"/>
     <g transform="translate(3, 3)">
         <defs>
             <linearGradient id="lobe-icons-gemma-fill" x1="24.419%" x2="75.194%" y1="75.581%" y2="25.194%">
