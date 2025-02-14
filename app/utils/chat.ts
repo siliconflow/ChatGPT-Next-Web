@@ -552,7 +552,7 @@ export function streamWithThink(
             const resJson = await res.clone().json();
             extraInfo = prettyObject(resJson);
             if (resJson.code === 30001 || resJson.code === 30011) {
-              extraInfo = `⚠️不好，余额不足了，请先完成充值 👉 [立即充值](${SiliconFlow.BillPath})`;
+              extraInfo = `⚠️ 不好，余额不足了，请先完成充值 👉 [立即充值](${SiliconFlow.BillPath})`;
             }
             if (resJson.code === 50603) {
               extraInfo = `⚠️系统繁忙，请稍后重试`;
