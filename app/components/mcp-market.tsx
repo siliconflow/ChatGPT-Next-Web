@@ -94,7 +94,7 @@ export function McpMarketPage() {
       if (!mcpEnabled) return;
       try {
         setLoadingPresets(true);
-        const response = await fetch("https://nextchat.club/mcp/list");
+        const response = await fetch("https://siliconchat.club/mcp/list");
         if (!response.ok) {
           throw new Error("Failed to load preset servers");
         }

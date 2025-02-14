@@ -1,13 +1,13 @@
 <div align="center">
 
-<a href='https://nextchat.dev/chat'>
+<a href='https://siliconchat.dev/chat'>
   <img src="https://github.com/user-attachments/assets/83bdcc07-ae5e-4954-a53a-ac151ba6ccf3" width="1000" alt="icon"/>
 </a>
 
 
 
 
-<h1 align="center">NextChat (ChatGPT Next Web)</h1>
+<h1 align="center">SiliconChat (ChatGPT Next Web)</h1>
 
 English / [简体中文](./README_CN.md)
 
@@ -22,19 +22,19 @@ English / [简体中文](./README_CN.md)
 [![MacOS][MacOS-image]][download-url]
 [![Linux][Linux-image]][download-url]
 
-[NextChatAI](https://nextchat.dev/chat?utm_source=readme) / [Web App Demo](https://app.nextchat.dev) / [Desktop App](https://github.com/Yidadaa/ChatGPT-Next-Web/releases) 
+[SiliconChatAI](https://siliconchat.dev/chat?utm_source=readme) / [Web App Demo](https://app.siliconchat.dev) / [Desktop App](https://github.com/Yidadaa/ChatGPT-Next-Web/releases) 
 
 
-[saas-url]: https://nextchat.dev/chat?utm_source=readme
-[saas-image]: https://img.shields.io/badge/NextChat-Saas-green?logo=microsoftedge
-[web-url]: https://app.nextchat.dev/
+[saas-url]: https://siliconchat.dev/chat?utm_source=readme
+[saas-image]: https://img.shields.io/badge/SiliconChat-Saas-green?logo=microsoftedge
+[web-url]: https://app.siliconchat.dev/
 [download-url]: https://github.com/Yidadaa/ChatGPT-Next-Web/releases
 [Web-image]: https://img.shields.io/badge/Web-PWA-orange?logo=microsoftedge
 [Windows-image]: https://img.shields.io/badge/-Windows-blue?logo=windows
 [MacOS-image]: https://img.shields.io/badge/-MacOS-black?logo=apple
 [Linux-image]: https://img.shields.io/badge/-Linux-333?logo=ubuntu
 
-[<img src="https://zeabur.com/button.svg" alt="Deploy on Zeabur" height="30">](https://zeabur.com/templates/ZBUEFA) [<img src="https://vercel.com/button" alt="Deploy on Vercel" height="30">](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FChatGPTNextWeb%2FChatGPT-Next-Web&env=OPENAI_API_KEY&env=CODE&project-name=nextchat&repository-name=NextChat)  [<img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" height="30">](https://gitpod.io/#https://github.com/ChatGPTNextWeb/NextChat) 
+[<img src="https://zeabur.com/button.svg" alt="Deploy on Zeabur" height="30">](https://zeabur.com/templates/ZBUEFA) [<img src="https://vercel.com/button" alt="Deploy on Vercel" height="30">](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FChatGPTNextWeb%2FChatGPT-Next-Web&env=OPENAI_API_KEY&env=CODE&project-name=siliconchat&repository-name=SiliconChat)  [<img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" height="30">](https://gitpod.io/#https://github.com/ChatGPTNextWeb/SiliconChat) 
 
 [<img src="https://github.com/user-attachments/assets/903482d4-3e87-4134-9af1-f2588fa90659" height="50" width="" >](https://monica.im/?utm=nxcrp)
 
@@ -47,7 +47,7 @@ English / [简体中文](./README_CN.md)
 
 
 
-## 🫣 NextChat Support MCP  ! 
+## 🫣 SiliconChat Support MCP  ! 
 > Before build, please set env ENABLE_MCP=true
 
 <img src="https://github.com/user-attachments/assets/d8851f40-4e36-4335-b1a4-ec1e11488c7e"/>
@@ -64,7 +64,7 @@ Meeting Your Company's Privatization and Customization Deployment Requirements:
 - **Private Deployment**: Enterprise-level private deployment supporting various mainstream private cloud solutions, ensuring data security and privacy protection.
 - **Continuous Updates**: Ongoing updates and upgrades in cutting-edge capabilities like multimodal AI, ensuring consistent innovation and advancement.
 
-For enterprise inquiries, please contact: **business@nextchat.dev**
+For enterprise inquiries, please contact: **business@siliconchat.dev**
 
 ## Screenshots
 
@@ -110,7 +110,7 @@ For enterprise inquiries, please contact: **business@nextchat.dev**
 ## What's New
 - 🚀 v2.15.8 Now supports Realtime Chat [#5672](https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web/issues/5672)
 - 🚀 v2.15.4 The Application supports using Tauri fetch LLM API, MORE SECURITY! [#5379](https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web/issues/5379)
-- 🚀 v2.15.0 Now supports Plugins! Read this: [NextChat-Awesome-Plugins](https://github.com/ChatGPTNextWeb/NextChat-Awesome-Plugins)
+- 🚀 v2.15.0 Now supports Plugins! Read this: [SiliconChat-Awesome-Plugins](https://github.com/ChatGPTNextWeb/SiliconChat-Awesome-Plugins)
 - 🚀 v2.14.0 Now supports  Artifacts & SD
 - 🚀 v2.10.1 support Google Gemini Pro model.
 - 🚀 v2.9.11 you can use azure endpoint now.

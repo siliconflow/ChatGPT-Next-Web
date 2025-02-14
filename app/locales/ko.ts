@@ -295,7 +295,7 @@ const ko: PartialLocaleType = {
         Title: "SiliconChat AI 사용하기",
         Label: "(가장 비용 효율적인 솔루션)",
         SubTitle:
-          "NextChat에 의해 공식적으로 유지 관리되며, 제로 구성으로 즉시 사용할 수 있으며, OpenAI o1, GPT-4o, Claude-3.5와 같은 최신 대형 모델을 지원합니다",
+          "SiliconChat에 의해 공식적으로 유지 관리되며, 제로 구성으로 즉시 사용할 수 있으며, OpenAI o1, GPT-4o, Claude-3.5와 같은 최신 대형 모델을 지원합니다",
         ChatNow: "지금 채팅하기",
       },
 
