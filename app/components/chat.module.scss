@@ -335,9 +335,9 @@
 .chat-body-main-title {
   cursor: pointer;
 
-  &:hover {
-    text-decoration: underline;
-  }
+  // &:hover {
+  //   text-decoration: underline;
+  // }
 }
 
 @media only screen and (max-width: 600px) {
