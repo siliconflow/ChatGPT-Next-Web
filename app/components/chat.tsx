@@ -660,16 +660,20 @@ export function ChatActions(props: {
   }, [chatStore, currentModel, models, session]);
   const v3 = "deepseek-ai/DeepSeek-V3";
   const r1 = "deepseek-ai/DeepSeek-R1";
+  const appConfig = useAppConfig();
+  const initModel =
+    appConfig.siliconConfig.thinkOrProModel || session.mask.modelConfig.model;
   const [isDeepThinking, setDeepThinking] = useState(
-    session.mask.modelConfig.model.toLowerCase().includes("r1"),
+    initModel.toLowerCase().includes("r1"),
   );
-  const [isPro, setPro] = useState(
-    session.mask.modelConfig.model.toLowerCase().includes("pro"),
-  );
+  const [isPro, setPro] = useState(initModel.toLowerCase().includes("pro"));
   const updateModel = (t: boolean, p: boolean) => {
+    let m = t ? r1 : v3;
+    m = p ? `Pro/${m}` : m;
+    appConfig.update((config) => {
+      config.siliconConfig.thinkOrProModel = m;
+    });
     chatStore.updateTargetSession(session, (session) => {
-      let m = t ? r1 : v3;
-      m = p ? `Pro/${m}` : m;
       session.mask.modelConfig.model = m as ModelType;
       console.log("updateModel", session.mask.modelConfig.model);
       session.mask.modelConfig.providerName = "SiliconFlow" as ServiceProvider;
