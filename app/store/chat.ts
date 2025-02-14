@@ -182,6 +182,7 @@ function fillTemplateWith(input: string, modelConfig: ModelConfig) {
     time: new Date().toString(),
     lang: getLang(),
     input: input,
+    current_date: new Date().toLocaleDateString(),
   };
 
   let output = modelConfig.template ?? DEFAULT_INPUT_TEMPLATE;
@@ -568,7 +569,7 @@ export const useChatStore = createPersistStore(
           t = DEFAULT_SYSTEM_TEMPLATE_V3;
         if (session.mask.modelConfig.model.toLowerCase().includes("r1"))
           t = DEFAULT_SYSTEM_TEMPLATE_R1;
-        if (shouldInjectSystemPrompts) {
+        if (shouldInjectSystemPrompts || 1) {
           systemPrompts = [
             createMessage({
               role: "system",
