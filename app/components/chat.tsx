@@ -678,7 +678,6 @@ export function ChatActions(props: {
       console.log("updateModel", session.mask.modelConfig.model);
       session.mask.modelConfig.providerName = "SiliconFlow" as ServiceProvider;
       session.mask.syncGlobalConfig = false;
-      showToast(m);
     });
   };
   return (
