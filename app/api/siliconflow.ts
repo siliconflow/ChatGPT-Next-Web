@@ -42,6 +42,40 @@ export async function handle(
   }
 }
 
+export function fillTemplateWith(
+  input: string,
+  modelConfig: { model: string; template?: string },
+) {
+  // Find the model in the DEFAULT_MODELS array that matches the modelConfig.model
+  const vars = {
+    ServiceProvider: ServiceProvider.SiliconFlow,
+    model: modelConfig.model,
+    time: new Date().toString(),
+    input: input,
+    current_date: new Date().toLocaleDateString(),
+  };
+
+  let output = modelConfig.template ?? DEFAULT_SYSTEM_TEMPLATE;
+
+  // remove duplicate
+  if (input.startsWith(output)) {
+    output = "";
+  }
+
+  // must contains {{input}}
+  const inputVar = "{{input}}";
+  if (!output.includes(inputVar)) {
+    output += "\n" + inputVar;
+  }
+
+  Object.entries(vars).forEach(([name, value]) => {
+    const regex = new RegExp(`{{${name}}}`, "g");
+    output = output.replace(regex, value.toString()); // Ensure value is a string
+  });
+
+  return output;
+}
+
 async function request(req: NextRequest) {
   const controller = new AbortController();
 
@@ -96,7 +130,10 @@ async function request(req: NextRequest) {
     t = DEFAULT_SYSTEM_TEMPLATE_R1;
   const SYSTEM_PROMPT: RequestMessage = {
     role: "system",
-    content: t,
+    content: fillTemplateWith("", {
+      template: t,
+      model: (jsonBody.model || "").replace("Pro/", ""),
+    }),
   };
   if (jsonBody.messages) {
     jsonBody.messages = [

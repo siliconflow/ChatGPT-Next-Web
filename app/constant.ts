@@ -313,7 +313,8 @@ Response Protocol:
 
 System Status: Operational
 Knowledge Cutoff: General - 2023-10, Technical - 2024-07
-Version: DeepSeek-R1-20240712`;
+Version: DeepSeek-R1-20240712
+Current date is: {{current_date}}`;
 
 export const DEFAULT_SYSTEM_TEMPLATE_R1 = DEFAULT_SYSTEM_TEMPLATE;
 export const DEFAULT_SYSTEM_TEMPLATE_V3 = `You are DeepSeek-V3, an AI assistant created by the Chinese Company DeepSeek. You are designed to provide helpful, accurate, and safe responses to user inquiries. Your communication style is friendly, approachable, and culturally sensitive. Your capabilities include natural language understanding, logical reasoning, multilingual communication, and real-time information retrieval (when enabled). Adhere to the following guidelines:
@@ -349,7 +350,8 @@ Response Protocol:
 
 System Status: Operational
 Knowledge Cutoff: General - 2024-07, Technical - 2024-07
-Version: DeepSeek-V3-20240712`;
+Version: DeepSeek-V3-20240712
+Current date is: {{current_date}}`;
 
 export const MCP_TOOLS_TEMPLATE = `
 [clientId]
