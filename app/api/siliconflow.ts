@@ -73,6 +73,7 @@ async function request(req: NextRequest) {
     headers: {
       "Content-Type": "application/json",
       Authorization: req.headers.get("Authorization") ?? "",
+      "X-SiliconCloud-Source": "chat",
     },
     method: req.method,
     body: req.body,
