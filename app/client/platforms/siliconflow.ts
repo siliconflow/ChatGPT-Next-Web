@@ -46,6 +46,7 @@ export class SiliconflowApi implements LLMApi {
 
   path(path: string): string {
     const accessStore = useAccessStore.getState();
+    const serverConfig = getServerSideConfig();
 
     let baseUrl = "";
 
@@ -60,7 +61,7 @@ export class SiliconflowApi implements LLMApi {
     }
 
     // Don't proxy if vercel
-    if (getServerSideConfig().isVercel) {
+    if (serverConfig?.isVercel) {
       baseUrl = SiliconFlow.ExampleEndpoint;
     }
 
