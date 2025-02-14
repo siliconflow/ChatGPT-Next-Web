@@ -409,7 +409,7 @@ export function streamWithThink(
       responseText += remainText;
       console.log("[Response Animation] finished");
       if (responseText?.length === 0) {
-        options.onError?.(new Error("empty response from server"));
+        options.onError?.(new Error("服务器繁忙，请稍后再试"));
       }
       return;
     }
