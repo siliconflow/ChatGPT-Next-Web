@@ -68,8 +68,9 @@ export class SiliconflowApi implements LLMApi {
       baseUrl = "https://" + baseUrl;
     }
 
+    const isVercelBuild = !!getClientConfig()?.isVercelBuild;
     // If we are building on Vercel, directly access to SiliconFlow API for better performance
-    if (!!getClientConfig()?.isVercelBuild) {
+    if (isVercelBuild) {
       baseUrl = SILICONFLOW_BASE_URL;
     }
 
