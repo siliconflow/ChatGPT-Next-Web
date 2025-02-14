@@ -271,7 +271,6 @@ export const useAccessStore = createPersistStore(
         .then((res: DangerConfig) => {
           console.log("[Config] got config from server", res);
           set(() => ({ ...res }));
-          set(() => ({ siliconflowUrl: SILICONFLOW_BASE_URL }));
           const sfak = retrieveAPIKeyFromCookies();
           if (sfak) {
             set(() => ({ siliconflowApiKey: sfak }));
