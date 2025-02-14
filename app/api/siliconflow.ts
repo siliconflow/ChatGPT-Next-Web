@@ -4,11 +4,15 @@ import {
   ApiPath,
   ModelProvider,
   ServiceProvider,
+  DEFAULT_SYSTEM_TEMPLATE,
+  DEFAULT_SYSTEM_TEMPLATE_R1,
+  DEFAULT_SYSTEM_TEMPLATE_V3,
 } from "@/app/constant";
 import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth";
 import { isModelNotavailableInServer } from "@/app/utils/model";
+import { RequestMessage } from "../typing";
 
 const serverConfig = getServerSideConfig();
 
@@ -77,6 +81,31 @@ async function request(req: NextRequest) {
     duplex: "half",
     signal: controller.signal,
   };
+
+  const clonedBody = await req.text();
+  const jsonBody = JSON.parse(clonedBody) as {
+    model?: string;
+    messages?: Array<{ role: string; content: string }>;
+  };
+
+  let t = DEFAULT_SYSTEM_TEMPLATE;
+  if (jsonBody.model?.toLowerCase().includes("v3"))
+    t = DEFAULT_SYSTEM_TEMPLATE_V3;
+  if (jsonBody.model?.toLowerCase().includes("r1"))
+    t = DEFAULT_SYSTEM_TEMPLATE_R1;
+  const SYSTEM_PROMPT: RequestMessage = {
+    role: "system",
+    content: t,
+  };
+  if (jsonBody.messages) {
+    jsonBody.messages = [
+      SYSTEM_PROMPT,
+      ...jsonBody.messages.filter((m) => m.role !== "system"),
+    ];
+  } else {
+    jsonBody.messages = [SYSTEM_PROMPT];
+  }
+  fetchOptions.body = JSON.stringify(jsonBody);
 
   // #1815 try to refuse some request to some models
   if (serverConfig.customModels && req.body) {

@@ -556,8 +556,7 @@ export const useChatStore = createPersistStore(
         const shouldInjectSystemPrompts =
           modelConfig.enableInjectSystemPrompts &&
           (session.mask.modelConfig.model.startsWith("gpt-") ||
-            session.mask.modelConfig.model.startsWith("chatgpt-") ||
-            session.mask.modelConfig.model.toLowerCase().includes("deepseek"));
+            session.mask.modelConfig.model.startsWith("chatgpt-"));
 
         const mcpEnabled = await isMcpEnabled();
         const mcpSystemPrompt = mcpEnabled ? await getMcpSystemPrompt() : "";
