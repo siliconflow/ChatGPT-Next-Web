@@ -204,11 +204,9 @@ function Screen() {
   }
 
   const renderContent = () => {
-    if (!useAccessStore.getState().isValidSiliconFlow()) {
-      // if db doesn't have a key, but we have a key in cookies, we should wait
-      if (retrieveAPIKeyFromCookies()) {
-        return <Loading />;
-      }
+    // if db doesn't have a key, but we have a key in cookies, we should wait
+    if (showAuthModal && retrieveAPIKeyFromCookies()) {
+      return <Loading />;
     }
     if (isSd) return <Sd />;
     if (isSdNew) return <Sd />;
