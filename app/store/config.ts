@@ -68,7 +68,7 @@ export const DEFAULT_CONFIG = {
     providerName: "SiliconFlow" as ServiceProvider,
     temperature: 0.6,
     top_p: 1,
-    max_tokens: 10000,
+    max_tokens: 12000,
     presence_penalty: 0,
     frequency_penalty: 0,
     sendMemory: true,
