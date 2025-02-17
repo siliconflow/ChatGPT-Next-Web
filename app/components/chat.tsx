@@ -661,8 +661,7 @@ export function ChatActions(props: {
   const v3 = "deepseek-ai/DeepSeek-V3";
   const r1 = "deepseek-ai/DeepSeek-R1";
   const appConfig = useAppConfig();
-  const initModel =
-    appConfig.siliconConfig.thinkOrProModel || session.mask.modelConfig.model;
+  const initModel = session.mask.modelConfig.model;
   const [isDeepThinking, setDeepThinking] = useState(
     initModel.toLowerCase().includes("r1"),
   );
@@ -671,7 +670,7 @@ export function ChatActions(props: {
     let m = t ? r1 : v3;
     m = p ? `Pro/${m}` : m;
     appConfig.update((config) => {
-      config.siliconConfig.thinkOrProModel = m;
+      config.modelConfig.model = m;
     });
     chatStore.updateTargetSession(session, (session) => {
       session.mask.modelConfig.model = m as ModelType;
