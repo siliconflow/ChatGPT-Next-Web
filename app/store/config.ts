@@ -16,6 +16,7 @@ import {
 } from "../constant";
 import { createPersistStore } from "../utils/store";
 import type { Voice } from "rt-client";
+import { CustomEmoji } from "emoji-picker-react/dist/config/customEmojiConfig";
 
 export type ModelType = (typeof DEFAULT_MODELS)[number]["name"];
 export type TTSModelType = (typeof DEFAULT_TTS_MODELS)[number];
@@ -38,11 +39,39 @@ export enum Theme {
 
 const config = getClientConfig();
 
+const avatarsSiliconFlowMaaSPrefix =
+  "https://sf-maas-uat-prod.oss-cn-shanghai.aliyuncs.com/profile_imgs/";
+const avatarsSiliconFlowMaaSExtension = "jpeg";
+const avatarsSiliconFlowMaaSIds = [
+  "1",
+  "11",
+  "111",
+  "112",
+  "121",
+  "122",
+  "123",
+  "211",
+  "212",
+  "222",
+  "231",
+  "321",
+];
+export const customEmojisMaaS: CustomEmoji[] = avatarsSiliconFlowMaaSIds.map(
+  (id) => {
+    const url = `${avatarsSiliconFlowMaaSPrefix}${id}.${avatarsSiliconFlowMaaSExtension}`;
+    return {
+      names: [`Avatar${id}`],
+      imgUrl: url,
+      id: url,
+    };
+  },
+);
+const DefaultAvatar = customEmojisMaaS[0].id;
+
 export const DEFAULT_CONFIG = {
   lastUpdate: Date.now(), // timestamp, to merge state
-
   submitKey: SubmitKey.Enter,
-  avatar: "1f603",
+  avatar: DefaultAvatar,
   fontSize: 14,
   fontFamily: "",
   theme: Theme.Auto as Theme,

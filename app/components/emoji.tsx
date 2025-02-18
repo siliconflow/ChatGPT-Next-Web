@@ -1,10 +1,11 @@
 import EmojiPicker, {
+  Categories,
   Emoji,
   EmojiStyle,
   Theme as EmojiTheme,
 } from "emoji-picker-react";
 
-import { ModelType } from "../store";
+import { customEmojisMaaS, ModelType } from "../store";
 
 import BotIconDefault from "../icons/llm-icons/default.svg";
 import BotIconOpenAI from "../icons/llm-icons/openai.svg";
@@ -26,6 +27,8 @@ export function getEmojiUrl(unified: string, style: EmojiStyle) {
   // Whoever owns this Content Delivery Network (CDN), I am using your CDN to serve emojis
   // Old CDN broken, so I had to switch to this one
   // Author: https://github.com/H0llyW00dzZ
+  console.log("unified", unified);
+  console.log("style", style);
   return `https://fastly.jsdelivr.net/npm/emoji-datasource-apple/img/${style}/64/${unified}.png`;
 }
 
@@ -36,11 +39,20 @@ export function AvatarPicker(props: {
     <EmojiPicker
       width={"100%"}
       lazyLoadEmojis
+      skinTonesDisabled
       theme={EmojiTheme.AUTO}
+      previewConfig={{ showPreview: false }}
       getEmojiUrl={getEmojiUrl}
       onEmojiClick={(e) => {
         props.onEmojiClick(e.unified);
       }}
+      categories={[
+        {
+          category: Categories.CUSTOM,
+          name: "Chat",
+        },
+      ]}
+      customEmojis={customEmojisMaaS}
     />
   );
 }
@@ -107,6 +119,12 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
 }
 
 export function EmojiAvatar(props: { avatar: string; size?: number }) {
+  if (props.avatar.includes("https://")) {
+    console.log("EmojiAvatar", props);
+    return (
+      <Emoji unified="1f603" size={props.size ?? 18} emojiUrl={props.avatar} />
+    );
+  }
   return (
     <Emoji
       unified={props.avatar}

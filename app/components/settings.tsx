@@ -1492,6 +1492,7 @@ export function Settings() {
               content={
                 <AvatarPicker
                   onEmojiClick={(avatar: string) => {
+                    console.log("[Settings] set avatar", avatar);
                     updateConfig((config) => (config.avatar = avatar));
                     setShowEmojiPicker(false);
                   }}
