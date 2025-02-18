@@ -46,7 +46,12 @@ export function AvatarPicker(props: {
       onEmojiClick={(e) => {
         props.onEmojiClick(e.unified);
       }}
+      searchDisabled
       categories={[
+        {
+          category: Categories.SUGGESTED,
+          name: "Recent",
+        },
         {
           category: Categories.CUSTOM,
           name: "Chat",
