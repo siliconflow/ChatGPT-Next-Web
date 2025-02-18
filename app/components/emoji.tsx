@@ -125,7 +125,6 @@ export function Avatar(props: { model?: ModelType; avatar?: string }) {
 
 export function EmojiAvatar(props: { avatar: string; size?: number }) {
   if (props.avatar.includes("https://")) {
-    console.log("EmojiAvatar", props);
     return (
       <Emoji unified="1f603" size={props.size ?? 18} emojiUrl={props.avatar} />
     );
