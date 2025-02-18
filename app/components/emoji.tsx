@@ -54,7 +54,7 @@ export function AvatarPicker(props: {
         },
         {
           category: Categories.CUSTOM,
-          name: "Chat",
+          name: "SiliconCloud",
         },
       ]}
       customEmojis={customEmojisMaaS}
