@@ -692,10 +692,9 @@ export function ChatActions(props: {
         <ChatActionFull
           icon={<ThinkIcon />}
           onClick={() => {
-            setDeepThinking((i) => {
-              updateModel(!i, isPro);
-              return !i;
-            });
+            const newDeepThinking = !isDeepThinking;
+            setDeepThinking(newDeepThinking);
+            updateModel(newDeepThinking, isPro);
           }}
           text={"深度思考"}
           active={isDeepThinking}
@@ -703,10 +702,9 @@ export function ChatActions(props: {
         <ChatActionFull
           icon={<ProIcon />}
           onClick={() => {
-            setPro((i) => {
-              updateModel(isDeepThinking, !i);
-              return !i;
-            });
+            const newPro = !isPro;
+            setPro(newPro);
+            updateModel(isDeepThinking, newPro);
           }}
           text={"Pro"}
           active={isPro}
