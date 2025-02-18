@@ -5,6 +5,7 @@ import {
   SILICONFLOW_BASE_URL,
   SiliconFlow,
   DEFAULT_MODELS,
+  REQUEST_TIMEOUT_MS_FOR_THINKING,
 } from "@/app/constant";
 import {
   useAccessStore,
@@ -26,7 +27,6 @@ import {
   getMessageTextContent,
   getMessageTextContentWithoutThinking,
   isVisionModel,
-  getTimeoutMSByModel,
 } from "@/app/utils";
 import { RequestPayload } from "./openai";
 import { fetch } from "@/app/utils/stream";
@@ -143,7 +143,7 @@ export class SiliconflowApi implements LLMApi {
       // Use extended timeout for thinking models as they typically require more processing time
       const requestTimeoutId = setTimeout(
         () => controller.abort(),
-        getTimeoutMSByModel(options.config.model),
+        REQUEST_TIMEOUT_MS_FOR_THINKING * 2,
       );
 
       if (shouldStream) {
