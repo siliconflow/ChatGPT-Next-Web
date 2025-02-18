@@ -621,7 +621,7 @@ export function streamWithThink(
               // Handle newlines in thinking content
               if (chunk.content.includes("\n")) {
                 const lines = chunk.content.split("\n");
-                remainText += lines.join("\n\n> ");
+                remainText += lines.join("\n> ");
               } else {
                 remainText += chunk.content;
               }
