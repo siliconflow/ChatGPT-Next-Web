@@ -163,13 +163,22 @@ export class SiliconflowApi implements LLMApi {
           (text: string, runTools: ChatMessageTool[]) => {
             // console.log("parseSSE", text, runTools);
             const json = JSON.parse(text);
+            console.log("json", json);
             const choices = json.choices as Array<{
+              finish_reason: string;
               delta: {
                 content: string | null;
                 tool_calls: ChatMessageTool[];
                 reasoning_content: string | null;
               };
             }>;
+            if (choices[0].finish_reason === "risky") {
+              return {
+                isThinking: false,
+                content: "",
+                shouldRecall: true,
+              };
+            }
             const tool_calls = choices[0]?.delta?.tool_calls;
             if (tool_calls?.length > 0) {
               const index = tool_calls[0]?.index;

@@ -385,6 +385,7 @@ export function streamWithThink(
   ) => {
     isThinking: boolean;
     content: string | undefined;
+    shouldRecall?: boolean | undefined;
   },
   processToolMessage: (
     requestPayload: any,
@@ -583,6 +584,9 @@ export function streamWithThink(
         }
         try {
           const chunk = parseSSE(text, runTools);
+          if (!!chunk.shouldRecall) {
+            responseText = "👀 让我们换个话题聊聊吧";
+          }
           // Skip if content is empty
           if (!chunk?.content || chunk.content.length === 0) {
             return;
