@@ -47,7 +47,7 @@ const formatSearchResultMarkdown = (
 ): string => {
   const getCircledNumber = (num: number): string => {
     if (num >= 1 && num <= 20) {
-      return String.fromCharCode(0x2460 + num - 1); // Unicode ①~⑳
+      return String.fromCharCode(0x2776 + num - 1);
     }
     return `(${num})`; // Fallback for numbers >20
   };
