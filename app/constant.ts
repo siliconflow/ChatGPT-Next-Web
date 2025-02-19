@@ -711,6 +711,7 @@ const siliconflowModels = [
   "meta-llama/Llama-3.3-70B-Instruct",
   "THUDM/glm-4-9b-chat",
   "Pro/deepseek-ai/DeepSeek-R1",
+  "Pro/deepseek-ai/DeepSeek-R1-Search",
   "Pro/deepseek-ai/DeepSeek-V3",
 ];
 

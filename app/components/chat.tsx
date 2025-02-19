@@ -50,6 +50,7 @@ import McpToolIcon from "../icons/tool.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
 import ProIcon from "../icons/lightning.svg";
 import ThinkIcon from "../icons/brain.svg";
+import SearchIcon from "../icons/discovery.svg";
 import {
   BOT_HELLO,
   ChatMessage,
@@ -666,9 +667,11 @@ export function ChatActions(props: {
     initModel.toLowerCase().includes("r1"),
   );
   const [isPro, setPro] = useState(initModel.toLowerCase().includes("pro"));
-  const updateModel = (t: boolean, p: boolean) => {
+  const [isSearch, setSearch] = useState(appConfig.search);
+  const updateModel = (t: boolean, p: boolean, s: boolean) => {
     let m = t ? r1 : v3;
     m = p ? `Pro/${m}` : m;
+    m = s ? `${m}-Search` : m;
     appConfig.update((config) => {
       config.modelConfig.model = m;
     });
@@ -694,7 +697,7 @@ export function ChatActions(props: {
           onClick={() => {
             const newDeepThinking = !isDeepThinking;
             setDeepThinking(newDeepThinking);
-            updateModel(newDeepThinking, isPro);
+            updateModel(newDeepThinking, isPro, isSearch);
           }}
           text={"深度思考"}
           active={isDeepThinking}
@@ -704,10 +707,29 @@ export function ChatActions(props: {
           onClick={() => {
             const newPro = !isPro;
             setPro(newPro);
-            updateModel(isDeepThinking, newPro);
+            updateModel(isDeepThinking, newPro, isSearch);
           }}
           text={"Pro"}
           active={isPro}
+        />
+        <ChatActionFull
+          icon={<SearchIcon />}
+          onClick={() => {
+            const newSearch = !isSearch;
+            appConfig.update((config) => {
+              config.search = newSearch;
+            });
+            setSearch(newSearch);
+            if (newSearch) {
+              setPro(true);
+              setDeepThinking(true);
+              updateModel(true, true, newSearch);
+            } else {
+              updateModel(isDeepThinking, isPro, newSearch);
+            }
+          }}
+          text={"联网搜索"}
+          active={isSearch}
         />
         {!props.hitBottom && (
           <ChatAction
