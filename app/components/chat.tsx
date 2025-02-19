@@ -667,7 +667,9 @@ export function ChatActions(props: {
     initModel.toLowerCase().includes("r1"),
   );
   const [isPro, setPro] = useState(initModel.toLowerCase().includes("pro"));
-  const [isSearch, setSearch] = useState(appConfig.search);
+  const [isSearch, setSearch] = useState(
+    initModel.toLowerCase().includes("search"),
+  );
   const updateModel = (t: boolean, p: boolean, s: boolean) => {
     let m = t ? r1 : v3;
     m = p ? `Pro/${m}` : m;
