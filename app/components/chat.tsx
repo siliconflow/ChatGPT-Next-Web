@@ -2045,12 +2045,14 @@ function _Chat() {
                                         onClick={() =>
                                           onDelete(message.id ?? i)
                                         }
+                                        hidden
                                       />
 
                                       <ChatAction
                                         text={Locale.Chat.Actions.Pin}
                                         icon={<PinIcon />}
                                         onClick={() => onPinMessage(message)}
+                                        hidden
                                       />
                                       <ChatAction
                                         text={Locale.Chat.Actions.Copy}
