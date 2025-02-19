@@ -13,6 +13,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth";
 import { isModelNotavailableInServer } from "@/app/utils/model";
 import { RequestMessage } from "../typing";
+import { WebSearchTool } from "./search";
+import {
+  fillSearchTemplateWith,
+  search_answer_zh_template,
+} from "./search_templates";
 
 const serverConfig = getServerSideConfig();
 
@@ -121,6 +126,7 @@ async function request(req: NextRequest) {
   const jsonBody = JSON.parse(clonedBody) as {
     model?: string;
     messages?: Array<{ role: string; content: string }>;
+    stream?: boolean;
   };
 
   let t = DEFAULT_SYSTEM_TEMPLATE;
@@ -142,6 +148,25 @@ async function request(req: NextRequest) {
     ];
   } else {
     jsonBody.messages = [SYSTEM_PROMPT];
+  }
+  let searchPrependResult = "";
+  const isSearch = jsonBody.stream && jsonBody.model?.includes("Search");
+  if (isSearch) {
+    const lastIndex = jsonBody.messages.length - 1;
+    if (lastIndex >= 0 && jsonBody.messages[lastIndex].role === "user") {
+      const lastUserMessage = jsonBody.messages[lastIndex];
+      const searchRes = await WebSearchTool(lastUserMessage.content);
+      searchPrependResult = searchRes.markdown + "\n";
+      jsonBody.messages[lastIndex] = {
+        role: "user",
+        content: fillSearchTemplateWith(
+          search_answer_zh_template,
+          lastUserMessage.content,
+          JSON.stringify(searchRes.search_results),
+        ),
+      };
+    }
+    jsonBody.model = jsonBody.model?.replace("-Search", "");
   }
   fetchOptions.body = JSON.stringify(jsonBody);
 
@@ -184,7 +209,82 @@ async function request(req: NextRequest) {
     // to disable nginx buffering
     newHeaders.set("X-Accel-Buffering", "no");
 
-    return new Response(res.body, {
+    const transformedStream =
+      res.body && isSearch
+        ? new ReadableStream({
+            async start(controller) {
+              const reader = res.body?.getReader();
+              const encoder = new TextEncoder();
+              const decoder = new TextDecoder();
+              const message0 = {
+                id: "01951d652447569f44138d05bccd4e86",
+                object: "chat.completion.chunk",
+                created: 1739954922,
+                model: "Pro/deepseek-ai/DeepSeek-R1",
+                choices: [
+                  {
+                    index: 0,
+                    delta: {
+                      content: null,
+                      reasoning_content: "",
+                      role: "assistant",
+                    },
+                    finish_reason: null,
+                    content_filter_results: {
+                      hate: { filtered: false },
+                      self_harm: { filtered: false },
+                      sexual: { filtered: false },
+                      violence: { filtered: false },
+                    },
+                  },
+                ],
+                system_fingerprint: "",
+                usage: {
+                  prompt_tokens: 2155,
+                  completion_tokens: 0,
+                  total_tokens: 2155,
+                },
+              };
+              type msg = typeof message0;
+              let msg0: msg | null = null;
+              try {
+                while (true && reader) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+
+                  if (!msg0) {
+                    const prefixData = "data: ";
+                    const suffixLineBreak = "\n\n";
+                    const msg_0_str = decoder.decode(value);
+                    const regex = /^data: (.*)\n\n$/;
+                    const match = msg_0_str.match(regex);
+
+                    if (match && match[1]) {
+                      msg0 = JSON.parse(match[1]) as msg;
+                      msg0.choices[0].delta.reasoning_content =
+                        searchPrependResult;
+                    } else {
+                      console.error("No JSON data found or invalid format.");
+                    }
+                    const customData = encoder.encode(
+                      prefixData + JSON.stringify(msg0) + suffixLineBreak,
+                    );
+                    controller.enqueue(customData);
+                    controller.enqueue(encoder.encode(msg_0_str));
+                  } else {
+                    controller.enqueue(value);
+                  }
+                }
+              } catch (error) {
+                controller.error(error);
+              } finally {
+                controller.close();
+              }
+            },
+          })
+        : res.body;
+
+    return new Response(transformedStream, {
       status: res.status,
       statusText: res.statusText,
       headers: newHeaders,
