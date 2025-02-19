@@ -70,7 +70,7 @@ export class SiliconflowApi implements LLMApi {
 
     const isVercelBuild = !!getClientConfig()?.isVercelBuild;
     // If we are building on Vercel, directly access to SiliconFlow API for better performance
-    if (isVercelBuild) {
+    if (isVercelBuild || !path.includes(SiliconFlow.ChatPath)) {
       baseUrl = SILICONFLOW_BASE_URL;
     }
 
