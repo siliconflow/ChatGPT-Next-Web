@@ -225,7 +225,7 @@ async function request(req: NextRequest) {
                   {
                     index: 0,
                     delta: {
-                      content: null,
+                      content: "",
                       reasoning_content: "",
                       role: "assistant",
                     },
@@ -246,13 +246,13 @@ async function request(req: NextRequest) {
                 },
               };
               type msg = typeof message0;
-              let msg0: msg | null = null;
+              let searchInjected = false;
               try {
                 while (true && reader) {
                   const { done, value } = await reader.read();
                   if (done) break;
-
-                  if (!msg0) {
+                  if (!searchInjected) {
+                    let msg0 = null;
                     const prefixData = "data: ";
                     const suffixLineBreak = "\n\n";
                     const msg_0_str = decoder.decode(value);
@@ -261,16 +261,24 @@ async function request(req: NextRequest) {
 
                     if (match && match[1]) {
                       msg0 = JSON.parse(match[1]) as msg;
-                      msg0.choices[0].delta.reasoning_content =
-                        searchPrependResult;
-                    } else {
-                      console.error("No JSON data found or invalid format.");
+                      if (!!msg0.choices[0].delta.reasoning_content) {
+                        msg0.choices[0].delta.reasoning_content = `${searchPrependResult}${msg0.choices[0].delta.reasoning_content}`;
+                        searchInjected = true;
+                      }
+                      if (!!msg0.choices[0].delta.content) {
+                        msg0.choices[0].delta.content = `${searchPrependResult}${msg0.choices[0].delta.reasoning_content}`;
+                        searchInjected = true;
+                      }
                     }
-                    const customData = encoder.encode(
-                      prefixData + JSON.stringify(msg0) + suffixLineBreak,
-                    );
-                    controller.enqueue(customData);
-                    controller.enqueue(encoder.encode(msg_0_str));
+
+                    if (searchInjected) {
+                      const customData = encoder.encode(
+                        prefixData + JSON.stringify(msg0) + suffixLineBreak,
+                      );
+                      controller.enqueue(customData);
+                    } else {
+                      controller.enqueue(value);
+                    }
                   } else {
                     controller.enqueue(value);
                   }
