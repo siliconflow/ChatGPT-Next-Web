@@ -699,7 +699,14 @@ export function ChatActions(props: {
           onClick={() => {
             const newDeepThinking = !isDeepThinking;
             setDeepThinking(newDeepThinking);
-            updateModel(newDeepThinking, isPro, isSearch);
+
+            let newSearch = isSearch;
+            if (!newDeepThinking) {
+              newSearch = newDeepThinking;
+              setSearch(newSearch);
+            }
+
+            updateModel(newDeepThinking, isPro, newSearch);
           }}
           text={"深度思考"}
           active={isDeepThinking}
@@ -709,7 +716,14 @@ export function ChatActions(props: {
           onClick={() => {
             const newPro = !isPro;
             setPro(newPro);
-            updateModel(isDeepThinking, newPro, isSearch);
+
+            let newSearch = isSearch;
+            if (!newPro) {
+              newSearch = newPro;
+              setSearch(newSearch);
+            }
+
+            updateModel(isDeepThinking, newPro, newSearch);
           }}
           text={"Pro"}
           active={isPro}
@@ -718,9 +732,6 @@ export function ChatActions(props: {
           icon={<SearchIcon />}
           onClick={() => {
             const newSearch = !isSearch;
-            appConfig.update((config) => {
-              config.search = newSearch;
-            });
             setSearch(newSearch);
             if (newSearch) {
               setPro(true);
