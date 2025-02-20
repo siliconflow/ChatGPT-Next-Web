@@ -630,11 +630,37 @@ export function streamWithThink(
                 : `(${num})`;
             };
 
+            const customFormatUnix = (timestamp: number): string => {
+              const unixToDate = (timestamp: number): Date => {
+                return new Date(timestamp); // Convert seconds to milliseconds
+              };
+              const date = unixToDate(timestamp);
+              return (
+                `${date.getFullYear()}-${(date.getMonth() + 1)
+                  .toString()
+                  .padStart(2, "0")}-${date
+                  .getDate()
+                  .toString()
+                  .padStart(2, "0")} ` +
+                `${date.getHours().toString().padStart(2, "0")}:${date
+                  .getMinutes()
+                  .toString()
+                  .padStart(2, "0")}:${date
+                  .getSeconds()
+                  .toString()
+                  .padStart(2, "0")}`
+              );
+            };
+
             const formatMarkdownLink = (
               result: SearchResultEntry,
               index: number,
             ): string =>
-              `[${getCircledNumber(index + 1)} ${result.title}](${result.url})`;
+              `${getCircledNumber(index + 1)} [${result.title}](${
+                result.url
+              }) ${customFormatUnix(result.published_at)}\n> ${
+                result.snippet
+              }\n`;
 
             options.onUpdateSearch?.(
               chunk.search_results.map(formatMarkdownLink).join("\n"),
