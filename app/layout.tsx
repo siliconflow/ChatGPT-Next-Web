@@ -10,7 +10,7 @@ import { getServerSideConfig } from "./config/server";
 
 export const metadata: Metadata = {
   title: "SiliconChat",
-  description: "Your personal ChatGPT Chat Bot.",
+  description: "你触手可及的AI伙伴",
   appleWebApp: {
     title: "SiliconChat",
     statusBarStyle: "default",
