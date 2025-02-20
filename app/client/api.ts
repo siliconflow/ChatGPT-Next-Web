@@ -72,6 +72,8 @@ export interface ChatOptions {
   config: LLMConfig;
 
   onUpdate?: (message: string, chunk: string) => void;
+  onUpdateThinking?: (message: string, chunk: string) => void;
+  onUpdateSearch?: (message: string, chunk: string) => void;
   onFinish: (message: string, responseRes: Response) => void;
   onError?: (err: Error) => void;
   onController?: (controller: AbortController) => void;

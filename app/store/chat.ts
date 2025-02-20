@@ -446,7 +446,22 @@ export const useChatStore = createPersistStore(
         // get recent messages
         const recentMessages = await get().getMessagesWithMemory();
         const sendMessages = recentMessages.concat(userMessage);
-        const messageIndex = session.messages.length + 1;
+        const isSearch = modelConfig.model.toLowerCase().includes("search");
+        const isThinking = modelConfig.model.toLowerCase().includes("r1");
+        const msgParams = {
+          role: botMessage.role,
+          streaming: botMessage.streaming,
+          model: botMessage.model,
+        };
+        const thinkingMessage = createMessage(msgParams);
+        const searchMessage = createMessage(msgParams);
+        const searchMessages = isSearch ? [searchMessage] : [];
+        const thinkingMessages = isThinking ? [thinkingMessage] : [];
+        const messageIndex =
+          session.messages.length +
+          1 +
+          (isSearch ? 1 : 0) +
+          (isThinking ? 1 : 0);
 
         // save user's and bot's message
         get().updateTargetSession(session, (session) => {
@@ -454,17 +469,35 @@ export const useChatStore = createPersistStore(
             ...userMessage,
             content: mContent,
           };
-          session.messages = session.messages.concat([
-            savedUserMessage,
-            botMessage,
-          ]);
+          session.messages = session.messages
+            .concat([savedUserMessage])
+            .concat(searchMessages)
+            .concat(thinkingMessages)
+            .concat([botMessage]);
         });
-
         const api: ClientApi = getClientApi(modelConfig.providerName);
         // make request
         api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: true },
+          onUpdateThinking(message) {
+            thinkingMessage.streaming = true;
+            if (message) {
+              thinkingMessage.content = message;
+            }
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
+            });
+          },
+          onUpdateSearch(message) {
+            searchMessage.streaming = true;
+            if (message) {
+              searchMessage.content = message;
+            }
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
+            });
+          },
           onUpdate(message) {
             botMessage.streaming = true;
             if (message) {

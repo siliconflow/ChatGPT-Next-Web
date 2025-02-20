@@ -31,6 +31,7 @@ import {
 import { RequestPayload } from "./openai";
 import { fetch } from "@/app/utils/stream";
 import { Cookies } from "react-cookie";
+import { SearchIndexes, SearchResults } from "@/app/search_templates";
 export interface SiliconFlowListModelResponse {
   object: string;
   data: Array<{
@@ -169,13 +170,31 @@ export class SiliconflowApi implements LLMApi {
                 content: string | null;
                 tool_calls: ChatMessageTool[];
                 reasoning_content: string | null;
+                search_results: SearchResults | undefined;
+                search_indexes: SearchIndexes | undefined;
               };
             }>;
             if (choices[0].finish_reason === "risky") {
               return {
                 isThinking: false,
-                content: "",
+                content: undefined,
                 shouldRecall: true,
+              };
+            }
+            if (!!choices[0].delta.search_indexes) {
+              console.log("[Search Indexes]", choices[0].delta.search_indexes);
+              return {
+                isThinking: false,
+                search_indexes: choices[0].delta.search_indexes,
+                content: undefined,
+              };
+            }
+            if (!!choices[0].delta.search_results) {
+              console.log("[Search Results]", choices[0].delta.search_results);
+              return {
+                isThinking: false,
+                search_results: choices[0].delta.search_results,
+                content: "",
               };
             }
             const tool_calls = choices[0]?.delta?.tool_calls;

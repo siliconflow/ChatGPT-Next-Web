@@ -12,6 +12,11 @@ import {
 } from "@fortaine/fetch-event-source";
 import { prettyObject } from "./format";
 import { fetch as tauriFetch } from "./stream";
+import {
+  SearchIndexes,
+  SearchResultEntry,
+  SearchResults,
+} from "../search_templates";
 
 export function compressImage(file: Blob, maxSize: number): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -386,6 +391,8 @@ export function streamWithThink(
     isThinking: boolean;
     content: string | undefined;
     shouldRecall?: boolean | undefined;
+    search_results?: SearchResults | undefined;
+    search_indexes?: SearchIndexes | undefined;
   },
   processToolMessage: (
     requestPayload: any,
@@ -396,6 +403,8 @@ export function streamWithThink(
 ) {
   let responseText = "";
   let remainText = "";
+  let responseTextThinking = "";
+  let remainTextThinking = "";
   let finished = false;
   let running = false;
   let runTools: any[] = [];
@@ -403,6 +412,33 @@ export function streamWithThink(
   let isInThinkingMode = false;
   let lastIsThinking = false;
   let lastIsThinkingTagged = false; //between <think> and </think> tags
+
+  // animate response to make it looks smooth
+  function animateResponseTextThinking() {
+    if (finished || controller.signal.aborted) {
+      responseTextThinking += remainTextThinking;
+      console.log("[Response Animation] finished");
+      if (responseTextThinking?.length === 0) {
+        options.onError?.(new Error("服务器繁忙，请稍后再试"));
+      }
+      return;
+    }
+
+    if (remainTextThinking.length > 0) {
+      const fetchCount = Math.max(
+        1,
+        Math.round(remainTextThinking.length / 60),
+      );
+      const fetchText = remainTextThinking.slice(0, fetchCount);
+      responseTextThinking += fetchText;
+      remainTextThinking = remainTextThinking.slice(fetchCount);
+      options.onUpdateThinking?.(responseTextThinking, fetchText);
+    }
+
+    requestAnimationFrame(animateResponseTextThinking);
+  }
+  // start animaion
+  animateResponseTextThinking();
 
   // animate response to make it looks smooth
   function animateResponseText() {
@@ -587,58 +623,52 @@ export function streamWithThink(
           if (!!chunk.shouldRecall) {
             responseText = "👀 让我们换个话题聊聊吧";
           }
+          if (chunk.search_results) {
+            const getCircledNumber = (num: number): string => {
+              return num <= 20
+                ? String.fromCharCode(0x2776 + num - 1)
+                : `(${num})`;
+            };
+
+            const formatMarkdownLink = (
+              result: SearchResultEntry,
+              index: number,
+            ): string =>
+              `[${getCircledNumber(index + 1)} ${result.title}](${result.url})`;
+
+            options.onUpdateSearch?.(
+              chunk.search_results.map(formatMarkdownLink).join("\n"),
+              "",
+            );
+          }
           // Skip if content is empty
           if (!chunk?.content || chunk.content.length === 0) {
             return;
           }
 
-          // deal with <think> and </think> tags start
-          if (!chunk.isThinking) {
-            if (chunk.content.startsWith("<think>")) {
-              chunk.isThinking = true;
-              chunk.content = chunk.content.slice(7).trim();
-              lastIsThinkingTagged = true;
-            } else if (chunk.content.endsWith("</think>")) {
-              chunk.isThinking = false;
-              chunk.content = chunk.content.slice(0, -8).trim();
-              lastIsThinkingTagged = false;
-            } else if (lastIsThinkingTagged) {
-              chunk.isThinking = true;
-            }
-          }
-          // deal with <think> and </think> tags start
-
           // Check if thinking mode changed
           const isThinkingChanged = lastIsThinking !== chunk.isThinking;
           lastIsThinking = chunk.isThinking;
 
+          if (chunk.content.startsWith("⚠️ Search Failed")) {
+            console.log("[Request] Search Failed");
+            options.onUpdateSearch?.(chunk.content, chunk.content);
+            chunk.content = "";
+          }
+
           if (chunk.isThinking) {
             // If in thinking mode
             if (!isInThinkingMode || isThinkingChanged) {
-              // If this is a new thinking block or mode changed, add prefix
               isInThinkingMode = true;
-              if (remainText.length > 0) {
-                remainText += "\n";
-              }
-              remainText += "> " + chunk.content;
-            } else {
-              // Handle newlines in thinking content
-              if (chunk.content.includes("\n")) {
-                const lines = chunk.content.split("\n");
-                remainText += lines.join("\n> ");
-              } else {
-                remainText += chunk.content;
-              }
             }
+            remainTextThinking += chunk.content;
           } else {
             // If in normal mode
             if (isInThinkingMode || isThinkingChanged) {
               // If switching from thinking mode to normal mode
               isInThinkingMode = false;
-              remainText += "\n\n" + chunk.content;
-            } else {
-              remainText += chunk.content;
             }
+            remainText += chunk.content;
           }
         } catch (e) {
           console.error("[Request] parse error", text, msg, e);
