@@ -50,7 +50,6 @@ import McpToolIcon from "../icons/tool.svg";
 import HeadphoneIcon from "../icons/headphone.svg";
 import ProIcon from "../icons/lightning.svg";
 import ThinkIcon from "../icons/brain.svg";
-import SearchIcon from "../icons/discovery.svg";
 import {
   BOT_HELLO,
   ChatMessage,
@@ -728,7 +727,7 @@ export function ChatActions(props: {
           text={"Pro"}
           active={isPro}
         />
-        <ChatActionFull
+        {/* <ChatActionFull
           icon={<SearchIcon />}
           onClick={() => {
             const newSearch = !isSearch;
@@ -743,7 +742,7 @@ export function ChatActions(props: {
           }}
           text={"联网搜索"}
           active={isSearch}
-        />
+        /> */}
         {!props.hitBottom && (
           <ChatAction
             onClick={props.scrollToBottom}
