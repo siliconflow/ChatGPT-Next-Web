@@ -414,11 +414,12 @@ export function streamWithThink(
   let lastIsThinkingTagged = false; //between <think> and </think> tags
 
   // animate response to make it looks smooth
-  function animateResponseTextThinking() {
+  function animateResponseText() {
     if (finished || controller.signal.aborted) {
       responseTextThinking += remainTextThinking;
+      responseText += remainText;
       console.log("[Response Animation] finished");
-      if (responseTextThinking?.length === 0) {
+      if (responseText?.length === 0) {
         options.onError?.(new Error("服务器繁忙，请稍后再试"));
       }
       return;
@@ -433,22 +434,6 @@ export function streamWithThink(
       responseTextThinking += fetchText;
       remainTextThinking = remainTextThinking.slice(fetchCount);
       options.onUpdateThinking?.(responseTextThinking, fetchText);
-    }
-
-    requestAnimationFrame(animateResponseTextThinking);
-  }
-  // start animaion
-  animateResponseTextThinking();
-
-  // animate response to make it looks smooth
-  function animateResponseText() {
-    if (finished || controller.signal.aborted) {
-      responseText += remainText;
-      console.log("[Response Animation] finished");
-      if (responseText?.length === 0) {
-        options.onError?.(new Error("服务器繁忙，请稍后再试"));
-      }
-      return;
     }
 
     if (remainText.length > 0) {
