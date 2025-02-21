@@ -103,6 +103,7 @@ import {
 } from "./ui-lib";
 import { useNavigate } from "react-router-dom";
 import {
+  ApiPath,
   CHAT_PAGE_SIZE,
   DEFAULT_TTS_ENGINE,
   ModelProvider,
@@ -670,6 +671,8 @@ export function ChatActions(props: {
   const [isSearch, setSearch] = useState(
     initModel.toLowerCase().includes("search"),
   );
+  const accessStore = useAccessStore();
+  const isVercelBuild = !!getClientConfig()?.isVercelBuild;
   const updateModel = (t: boolean, p: boolean, s: boolean) => {
     let m = t ? r1 : v3;
     m = p ? `Pro/${m}` : m;
@@ -677,6 +680,11 @@ export function ChatActions(props: {
     appConfig.update((config) => {
       config.modelConfig.model = m;
     });
+    if (s && !isVercelBuild) {
+      accessStore.update((store) => {
+        store.siliconflowUrl = ApiPath.SiliconFlow;
+      });
+    }
     chatStore.updateTargetSession(session, (session) => {
       session.mask.modelConfig.model = m as ModelType;
       console.log("updateModel", session.mask.modelConfig.model);
