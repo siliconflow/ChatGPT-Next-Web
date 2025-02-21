@@ -1,4 +1,12 @@
+import { SiliconFlow } from "../constant";
+
 export function prettyObject(msg: any) {
+  if (msg.code === 30001 || msg.code === 30011) {
+    return `⚠️ 不好，余额不足了，请先完成充值 👉 [立即充值](${SiliconFlow.BillPath})`;
+  }
+  if (msg.code === 50603) {
+    return `⚠️系统繁忙，请稍后重试`;
+  }
   const obj = msg;
   if (typeof msg !== "string") {
     msg = JSON.stringify(msg, null, "  ");
