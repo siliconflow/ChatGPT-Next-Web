@@ -478,21 +478,14 @@ export const useChatStore = createPersistStore(
           if (!!!citations) {
             return text;
           }
-          // Create a mapping from citation index to URL
           const citationMap = new Map<number, string>();
           for (const citation of citations) {
             citationMap.set(citation.cite_index, citation.url);
           }
-
           return text.replace(/\[citation:(\d+)\]/g, (match, citeIndexStr) => {
             const citeIndex = parseInt(citeIndexStr, 10);
-
-            // Convert number to circled Unicode character (❶-❿ for 1-10)
             const circledChar = String.fromCharCode(0x2775 + citeIndex);
-
-            // Get corresponding URL from citation data
             const url = citationMap.get(citeIndex);
-
             return url ? `[${circledChar}](${url})` : match;
           });
         }
