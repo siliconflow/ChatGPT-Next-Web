@@ -500,12 +500,10 @@ export const useChatStore = createPersistStore(
         api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: true },
-          onUpdateThinking(message) {
-            if (message) {
-              botMessage.reasoning_content = replaceCitations(
-                message,
-                botMessage.search_indexes,
-              );
+          onUpdateSearchIndexes(searchIndexes: SearchIndexes) {
+            botMessage.streaming = true;
+            if (searchIndexes) {
+              botMessage.search_indexes = searchIndexes;
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
@@ -520,10 +518,12 @@ export const useChatStore = createPersistStore(
               session.messages = session.messages.concat();
             });
           },
-          onUpdateSearchIndexes(searchIndexes: SearchIndexes) {
-            botMessage.streaming = true;
-            if (searchIndexes) {
-              botMessage.search_indexes = searchIndexes;
+          onUpdateThinking(message) {
+            if (message) {
+              botMessage.reasoning_content = replaceCitations(
+                message,
+                botMessage.search_indexes,
+              );
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
@@ -544,7 +544,10 @@ export const useChatStore = createPersistStore(
           async onFinish(message) {
             botMessage.streaming = false;
             if (message) {
-              botMessage.content = message;
+              botMessage.content = replaceCitations(
+                message,
+                botMessage.search_indexes,
+              );
               botMessage.date = new Date().toLocaleString();
               get().onNewMessage(botMessage, session);
             }
