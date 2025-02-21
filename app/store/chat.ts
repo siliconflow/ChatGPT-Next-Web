@@ -41,6 +41,7 @@ import { collectModelsWithDefaultModel } from "../utils/model";
 import { createEmptyMask, Mask } from "./mask";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
+import { SearchIndexes } from "../search_templates";
 
 const localStorage = safeLocalStorage();
 
@@ -66,6 +67,9 @@ export type ChatMessage = RequestMessage & {
   tools?: ChatMessageTool[];
   audio_url?: string;
   isMcpResponse?: boolean;
+  reasoning_content?: string;
+  search_content?: string;
+  search_indexes?: SearchIndexes;
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
@@ -446,8 +450,15 @@ export const useChatStore = createPersistStore(
         // get recent messages
         const recentMessages = await get().getMessagesWithMemory();
         const sendMessages = recentMessages.concat(userMessage);
+        const isSearch = modelConfig.model.toLowerCase().includes("search");
+        const isThinking = modelConfig.model.toLowerCase().includes("r1");
         const messageIndex = session.messages.length + 1;
-
+        if (isThinking) {
+          botMessage.reasoning_content = "";
+        }
+        if (isSearch) {
+          botMessage.search_content = "";
+        }
         // save user's and bot's message
         get().updateTargetSession(session, (session) => {
           const savedUserMessage = {
@@ -459,16 +470,65 @@ export const useChatStore = createPersistStore(
             botMessage,
           ]);
         });
-
         const api: ClientApi = getClientApi(modelConfig.providerName);
+        function replaceCitations(
+          text: string,
+          citations: Array<{ url: string; cite_index: number }> | undefined,
+        ): string {
+          if (!!!citations) {
+            return text;
+          }
+          const citationMap = new Map<number, string>();
+          for (const citation of citations) {
+            citationMap.set(citation.cite_index, citation.url);
+          }
+          return text.replace(/\[citation:(\d+)\]/g, (match, citeIndexStr) => {
+            const citeIndex = parseInt(citeIndexStr, 10);
+            const circledChar = String.fromCharCode(0x2775 + citeIndex);
+            const url = citationMap.get(citeIndex);
+            return url ? `[${circledChar}](${url})` : match;
+          });
+        }
         // make request
         api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: true },
+          onUpdateSearchIndexes(searchIndexes: SearchIndexes) {
+            botMessage.streaming = true;
+            if (searchIndexes) {
+              botMessage.search_indexes = searchIndexes;
+            }
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
+            });
+          },
+          onUpdateSearch(message) {
+            botMessage.streaming = true;
+            if (message) {
+              botMessage.search_content = message;
+            }
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
+            });
+          },
+          onUpdateThinking(message) {
+            if (message) {
+              botMessage.reasoning_content = replaceCitations(
+                message,
+                botMessage.search_indexes,
+              );
+            }
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
+            });
+          },
           onUpdate(message) {
             botMessage.streaming = true;
             if (message) {
-              botMessage.content = message;
+              botMessage.content = replaceCitations(
+                message,
+                botMessage.search_indexes,
+              );
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
@@ -477,7 +537,10 @@ export const useChatStore = createPersistStore(
           async onFinish(message) {
             botMessage.streaming = false;
             if (message) {
-              botMessage.content = message;
+              botMessage.content = replaceCitations(
+                message,
+                botMessage.search_indexes,
+              );
               botMessage.date = new Date().toLocaleString();
               get().onNewMessage(botMessage, session);
             }

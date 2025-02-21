@@ -12,6 +12,11 @@ import {
 } from "@fortaine/fetch-event-source";
 import { prettyObject } from "./format";
 import { fetch as tauriFetch } from "./stream";
+import {
+  SearchIndexes,
+  SearchResultEntry,
+  SearchResults,
+} from "../search_templates";
 
 export function compressImage(file: Blob, maxSize: number): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -386,6 +391,8 @@ export function streamWithThink(
     isThinking: boolean;
     content: string | undefined;
     shouldRecall?: boolean | undefined;
+    search_results?: SearchResults | undefined;
+    search_indexes?: SearchIndexes | undefined;
   },
   processToolMessage: (
     requestPayload: any,
@@ -396,6 +403,10 @@ export function streamWithThink(
 ) {
   let responseText = "";
   let remainText = "";
+  let responseTextThinking = "";
+  let remainTextThinking = "";
+  let responseTextSearch = "";
+  let remainTextSearch = "";
   let finished = false;
   let running = false;
   let runTools: any[] = [];
@@ -407,6 +418,8 @@ export function streamWithThink(
   // animate response to make it looks smooth
   function animateResponseText() {
     if (finished || controller.signal.aborted) {
+      responseTextThinking += remainTextThinking;
+      responseTextSearch += remainTextSearch;
       responseText += remainText;
       console.log("[Response Animation] finished");
       if (responseText?.length === 0) {
@@ -415,7 +428,30 @@ export function streamWithThink(
       return;
     }
 
-    if (remainText.length > 0) {
+    if (remainTextSearch.length > 0) {
+      const fetchCount = Math.max(1, Math.round(remainTextSearch.length / 60));
+      const fetchText = remainTextSearch.slice(0, fetchCount);
+      responseTextSearch += fetchText;
+      remainTextSearch = remainTextSearch.slice(fetchCount);
+      options.onUpdateSearch?.(responseTextSearch, fetchText);
+    }
+
+    if (remainTextSearch.length == 0 && remainTextThinking.length > 0) {
+      const fetchCount = Math.max(
+        1,
+        Math.round(remainTextThinking.length / 60),
+      );
+      const fetchText = remainTextThinking.slice(0, fetchCount);
+      responseTextThinking += fetchText;
+      remainTextThinking = remainTextThinking.slice(fetchCount);
+      options.onUpdateThinking?.(responseTextThinking, fetchText);
+    }
+
+    if (
+      remainTextSearch.length == 0 &&
+      remainTextThinking.length == 0 &&
+      remainText.length > 0
+    ) {
       const fetchCount = Math.max(1, Math.round(remainText.length / 60));
       const fetchText = remainText.slice(0, fetchCount);
       responseText += fetchText;
@@ -587,58 +623,80 @@ export function streamWithThink(
           if (!!chunk.shouldRecall) {
             responseText = "👀 让我们换个话题聊聊吧";
           }
+          if (chunk.search_indexes) {
+            options.onUpdateSearchIndexes?.(chunk.search_indexes);
+          }
+          if (chunk.search_results) {
+            const getCircledNumber = (num: number): string => {
+              return num <= 20
+                ? String.fromCharCode(0x2776 + num - 1)
+                : `(${num})`;
+            };
+
+            const customFormatUnix = (timestamp: number): string => {
+              const unixToDate = (timestamp: number): Date => {
+                return new Date(timestamp); // Convert seconds to milliseconds
+              };
+              const date = unixToDate(timestamp);
+              return (
+                `${date.getFullYear()}-${(date.getMonth() + 1)
+                  .toString()
+                  .padStart(2, "0")}-${date
+                  .getDate()
+                  .toString()
+                  .padStart(2, "0")} ` +
+                `${date.getHours().toString().padStart(2, "0")}:${date
+                  .getMinutes()
+                  .toString()
+                  .padStart(2, "0")}:${date
+                  .getSeconds()
+                  .toString()
+                  .padStart(2, "0")}`
+              );
+            };
+
+            const formatMarkdownLink = (
+              result: SearchResultEntry,
+              index: number,
+            ): string =>
+              `${getCircledNumber(index + 1)} [${result.title}](${
+                result.url
+              }) ${customFormatUnix(result.published_at)}\n> ${
+                result.snippet
+              }\n`;
+
+            remainTextSearch = chunk.search_results
+              .map(formatMarkdownLink)
+              .join("\n");
+          }
           // Skip if content is empty
           if (!chunk?.content || chunk.content.length === 0) {
             return;
           }
 
-          // deal with <think> and </think> tags start
-          if (!chunk.isThinking) {
-            if (chunk.content.startsWith("<think>")) {
-              chunk.isThinking = true;
-              chunk.content = chunk.content.slice(7).trim();
-              lastIsThinkingTagged = true;
-            } else if (chunk.content.endsWith("</think>")) {
-              chunk.isThinking = false;
-              chunk.content = chunk.content.slice(0, -8).trim();
-              lastIsThinkingTagged = false;
-            } else if (lastIsThinkingTagged) {
-              chunk.isThinking = true;
-            }
-          }
-          // deal with <think> and </think> tags start
-
           // Check if thinking mode changed
           const isThinkingChanged = lastIsThinking !== chunk.isThinking;
           lastIsThinking = chunk.isThinking;
 
+          if (chunk.content.startsWith("⚠️ Search Failed")) {
+            console.log("[Request] Search Failed");
+            options.onUpdateSearch?.(chunk.content, chunk.content);
+            chunk.content = "";
+          }
+
           if (chunk.isThinking) {
             // If in thinking mode
             if (!isInThinkingMode || isThinkingChanged) {
-              // If this is a new thinking block or mode changed, add prefix
               isInThinkingMode = true;
-              if (remainText.length > 0) {
-                remainText += "\n";
-              }
-              remainText += "> " + chunk.content;
-            } else {
-              // Handle newlines in thinking content
-              if (chunk.content.includes("\n")) {
-                const lines = chunk.content.split("\n");
-                remainText += lines.join("\n> ");
-              } else {
-                remainText += chunk.content;
-              }
             }
+            remainTextThinking += chunk.content;
           } else {
             // If in normal mode
             if (isInThinkingMode || isThinkingChanged) {
               // If switching from thinking mode to normal mode
               isInThinkingMode = false;
-              remainText += "\n\n" + chunk.content;
-            } else {
-              remainText += chunk.content;
             }
+            remainText += chunk.content;
           }
         } catch (e) {
           console.error("[Request] parse error", text, msg, e);

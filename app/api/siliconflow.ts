@@ -13,11 +13,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth";
 import { isModelNotavailableInServer } from "@/app/utils/model";
 import { RequestMessage } from "../typing";
-import { WebSearchTool } from "./search";
+
+import {
+  EventStreamContentType,
+  fetchEventSource,
+} from "@fortaine/fetch-event-source";
+import { allowSearch, WebSearchResult, WebSearchTool } from "./search";
 import {
   fillSearchTemplateWith,
   search_answer_zh_template,
-} from "./search_templates";
+} from "../search_templates";
 
 const serverConfig = getServerSideConfig();
 
@@ -141,30 +146,42 @@ async function request(req: NextRequest) {
       model: (jsonBody.model || "").replace("Pro/", ""),
     }),
   };
-  if (jsonBody.messages) {
-    jsonBody.messages = [
-      SYSTEM_PROMPT,
-      ...jsonBody.messages.filter((m) => m.role !== "system"),
-    ];
-  } else {
-    jsonBody.messages = [SYSTEM_PROMPT];
-  }
-  let searchPrependResult = "";
   const isSearch = jsonBody.stream && jsonBody.model?.includes("Search");
-  if (isSearch) {
-    const lastIndex = jsonBody.messages.length - 1;
-    if (lastIndex >= 0 && jsonBody.messages[lastIndex].role === "user") {
-      const lastUserMessage = jsonBody.messages[lastIndex];
-      const searchRes = await WebSearchTool(lastUserMessage.content);
-      searchPrependResult = searchRes.markdown + "\n";
-      jsonBody.messages[lastIndex] = {
-        role: "user",
-        content: fillSearchTemplateWith(
-          search_answer_zh_template,
-          lastUserMessage.content,
-          JSON.stringify(searchRes.search_results),
-        ),
-      };
+  if (!isSearch) {
+    if (jsonBody.messages) {
+      jsonBody.messages = [
+        SYSTEM_PROMPT,
+        ...jsonBody.messages.filter((m) => m.role !== "system"),
+      ];
+    } else {
+      jsonBody.messages = [SYSTEM_PROMPT];
+    }
+  }
+  let searchRes: WebSearchResult | null = null;
+  if (isSearch && jsonBody.messages) {
+    try {
+      const isAllowedToUseSearch = await allowSearch(
+        req.headers.get("Authorization") || "",
+      );
+      const lastIndex = jsonBody.messages.length - 1;
+      if (
+        isAllowedToUseSearch &&
+        lastIndex >= 0 &&
+        jsonBody.messages[lastIndex].role === "user"
+      ) {
+        const lastUserMessage = jsonBody.messages[lastIndex];
+        searchRes = await WebSearchTool(lastUserMessage.content);
+        jsonBody.messages[lastIndex] = {
+          role: "user",
+          content: fillSearchTemplateWith(
+            search_answer_zh_template,
+            lastUserMessage.content,
+            JSON.stringify(searchRes.search_results),
+          ),
+        };
+      }
+    } catch (error) {
+      console.error("[SiliconFlow] Search Error", error);
     }
     jsonBody.model = jsonBody.model?.replace("-Search", "");
   }
@@ -200,6 +217,12 @@ async function request(req: NextRequest) {
       console.error(`[SiliconFlow] filter`, e);
     }
   }
+  req.signal.addEventListener("abort", () => {
+    controller.abort();
+  });
+  if (isSearch) {
+    return fetchAndPostProcess(fetchUrl, fetchOptions, searchRes);
+  }
   try {
     const res = await fetch(fetchUrl, fetchOptions);
 
@@ -208,91 +231,7 @@ async function request(req: NextRequest) {
     newHeaders.delete("www-authenticate");
     // to disable nginx buffering
     newHeaders.set("X-Accel-Buffering", "no");
-
-    const transformedStream =
-      res.body && isSearch
-        ? new ReadableStream({
-            async start(controller) {
-              const reader = res.body?.getReader();
-              const encoder = new TextEncoder();
-              const decoder = new TextDecoder();
-              const message0 = {
-                id: "01951d652447569f44138d05bccd4e86",
-                object: "chat.completion.chunk",
-                created: 1739954922,
-                model: "Pro/deepseek-ai/DeepSeek-R1",
-                choices: [
-                  {
-                    index: 0,
-                    delta: {
-                      content: "",
-                      reasoning_content: "",
-                      role: "assistant",
-                    },
-                    finish_reason: null,
-                    content_filter_results: {
-                      hate: { filtered: false },
-                      self_harm: { filtered: false },
-                      sexual: { filtered: false },
-                      violence: { filtered: false },
-                    },
-                  },
-                ],
-                system_fingerprint: "",
-                usage: {
-                  prompt_tokens: 2155,
-                  completion_tokens: 0,
-                  total_tokens: 2155,
-                },
-              };
-              type msg = typeof message0;
-              let searchInjected = false;
-              try {
-                while (true && reader) {
-                  const { done, value } = await reader.read();
-                  if (done) break;
-                  if (!searchInjected) {
-                    let msg0 = null;
-                    const prefixData = "data: ";
-                    const suffixLineBreak = "\n\n";
-                    const msg_0_str = decoder.decode(value);
-                    const regex = /^data: (.*)\n\n$/;
-                    const match = msg_0_str.match(regex);
-
-                    if (match && match[1]) {
-                      msg0 = JSON.parse(match[1]) as msg;
-                      if (!!msg0.choices[0].delta.reasoning_content) {
-                        msg0.choices[0].delta.reasoning_content = `${searchPrependResult}${msg0.choices[0].delta.reasoning_content}`;
-                        searchInjected = true;
-                      }
-                      if (!!msg0.choices[0].delta.content) {
-                        msg0.choices[0].delta.content = `${searchPrependResult}${msg0.choices[0].delta.reasoning_content}`;
-                        searchInjected = true;
-                      }
-                    }
-
-                    if (searchInjected) {
-                      const customData = encoder.encode(
-                        prefixData + JSON.stringify(msg0) + suffixLineBreak,
-                      );
-                      controller.enqueue(customData);
-                    } else {
-                      controller.enqueue(value);
-                    }
-                  } else {
-                    controller.enqueue(value);
-                  }
-                }
-              } catch (error) {
-                controller.error(error);
-              } finally {
-                controller.close();
-              }
-            },
-          })
-        : res.body;
-
-    return new Response(transformedStream, {
+    return new Response(res.body, {
       status: res.status,
       statusText: res.statusText,
       headers: newHeaders,
@@ -300,4 +239,132 @@ async function request(req: NextRequest) {
   } finally {
     clearTimeout(timeoutId);
   }
+}
+async function fetchAndPostProcess(
+  fetchUrl: string,
+  fetchOptions: RequestInit,
+  searchResult: WebSearchResult | null,
+) {
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+  const encoder = new TextEncoder();
+
+  const requestHeaders = new Headers(fetchOptions.headers);
+  const processedHeaders = Object.fromEntries(requestHeaders) as Record<
+    string,
+    string
+  >;
+
+  let openResolve: (value: Response | PromiseLike<Response>) => void;
+  let openReject: (reason?: any) => void;
+
+  const openPromise = new Promise<Response>((resolve, reject) => {
+    openResolve = resolve;
+    openReject = reject;
+  });
+
+  let responseText = "";
+
+  let searchResultSent = false;
+  fetchEventSource(fetchUrl, {
+    ...fetchOptions,
+    signal: fetchOptions.signal,
+    headers: processedHeaders,
+    async onopen(res) {
+      const contentType = res.headers.get("content-type");
+
+      if (contentType?.startsWith("text/plain")) {
+        responseText = await res.clone().text();
+        return openResolve(
+          new Response(responseText, {
+            status: res.status,
+            statusText: res.statusText,
+            headers: res.headers,
+          }),
+        );
+      }
+
+      if (
+        !res.ok ||
+        !res.headers.get("content-type")?.startsWith(EventStreamContentType) ||
+        res.status !== 200
+      ) {
+        const responseTexts = [responseText];
+        let extraInfo = await res.clone().text();
+        try {
+          const resJson = await res.clone().json();
+          extraInfo = prettyObject(resJson);
+        } catch {}
+
+        if (res.status === 401) {
+          responseTexts.push("Unauthorized");
+        }
+
+        if (extraInfo) {
+          responseTexts.push(extraInfo);
+        }
+        return openResolve(
+          new Response(responseTexts.join("\n"), {
+            status: res.status,
+            statusText: res.statusText,
+            headers: res.headers,
+          }),
+        );
+      }
+      return openResolve(
+        new Response(readable, {
+          status: res.status,
+          statusText: res.statusText,
+          headers: res.headers,
+        }),
+      );
+    },
+    onmessage(event) {
+      if (!searchResultSent) {
+        type Choices = Array<{
+          delta: any;
+        }>;
+        if (searchResult) {
+          for (const k of ["index", "query", "result"]) {
+            const chuck = JSON.parse(event.data) as { choices: Choices };
+            const key = k as keyof typeof searchResult.deltas;
+            chuck.choices = [{ delta: searchResult.deltas[key] }];
+            writer.write(encoder.encode(`data: ${JSON.stringify(chuck)}\n\n`));
+          }
+        } else {
+          const chuck = JSON.parse(event.data) as { choices: Choices };
+          chuck.choices = [
+            {
+              delta: {
+                content: null,
+                reasoning_content: "⚠️ Search Failed\n",
+                role: "assistant",
+              },
+            },
+          ];
+          writer.write(encoder.encode(`data: ${JSON.stringify(chuck)}\n\n`));
+        }
+        searchResultSent = true;
+      }
+      const data = event.data ? `data: ${event.data}\n` : "";
+      const eventStr = [
+        event.event ? `event: ${event.event}\n` : "",
+        data,
+        event.id ? `id: ${event.id}\n` : "",
+        event.retry ? `retry: ${event.retry}\n` : "",
+        "\n",
+      ].join("");
+      writer.write(encoder.encode(eventStr));
+    },
+    onclose() {
+      writer.close();
+    },
+    onerror(e) {
+      writer.abort(e);
+      throw e;
+    },
+    openWhenHidden: true,
+  });
+
+  return await openPromise;
 }

@@ -50,3 +50,46 @@ export function fillSearchTemplateWith(
 
   return output;
 }
+
+export const SearchResultDeltaExample = {
+  type: "search_result",
+  search_results: [
+    {
+      url: "https://www.163.com/dy/article/JOF6R92A05396I99.html",
+      title:
+        "加油!国内油价调整消息:2月16日柴油、汽油价格,下周油价大降成品油原油价格国际油价国际原油_网易订阅",
+      snippet:
+        "今天是2025年2月16日星期日,我们来看一看最新油价调整后,全国各地加油站0号柴油和92号汽油､95号汽油今日价格｡今年国内油价调整结果为“2涨0跌1平”,两次油价上调,一次因为成品油调价幅度不足每...",
+      published_at: 1739664306.0,
+      site_name: "网易",
+      site_icon: "https://file2.deepseek.com/site-icons/163.com",
+    },
+  ],
+};
+
+export const SearchQueryDeltaExample = {
+  type: "search_query",
+  search_queries: ["2025年2月16日 油价", "2025.2.16 国内油价 最新调整"],
+};
+
+export const SearchIndexDeltaExample = {
+  type: "search_index",
+  search_indexes: [
+    {
+      url: "https://www.163.com/dy/article/JOF6R92A05396I99.html",
+      cite_index: 1,
+    },
+    {
+      url: "https://www.sohu.com/a/843191182_121124479",
+      cite_index: 2,
+    },
+  ],
+};
+
+export type SearchResultDelta = typeof SearchResultDeltaExample;
+export type SearchResults = typeof SearchResultDeltaExample.search_results;
+export type SearchResultEntry =
+  (typeof SearchResultDeltaExample.search_results)[0];
+export type SearchQueryDelta = typeof SearchQueryDeltaExample;
+export type SearchIndexDelta = typeof SearchIndexDeltaExample;
+export type SearchIndexes = typeof SearchIndexDeltaExample.search_indexes;
