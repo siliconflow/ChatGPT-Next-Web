@@ -42,7 +42,7 @@ export interface SiliconFlowListModelResponse {
 }
 
 export class SiliconflowApi implements LLMApi {
-  private disableListModels = false;
+  private disableListModels = true;
 
   path(path: string): string {
     const accessStore = useAccessStore.getState();
