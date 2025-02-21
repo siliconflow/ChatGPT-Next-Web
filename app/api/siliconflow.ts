@@ -18,7 +18,7 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from "@fortaine/fetch-event-source";
-import { WebSearchResult, WebSearchTool } from "./search";
+import { allowSearch, WebSearchResult, WebSearchTool } from "./search";
 import {
   fillSearchTemplateWith,
   search_answer_zh_template,
@@ -146,20 +146,29 @@ async function request(req: NextRequest) {
       model: (jsonBody.model || "").replace("Pro/", ""),
     }),
   };
-  if (jsonBody.messages) {
-    jsonBody.messages = [
-      SYSTEM_PROMPT,
-      ...jsonBody.messages.filter((m) => m.role !== "system"),
-    ];
-  } else {
-    jsonBody.messages = [SYSTEM_PROMPT];
+  const isSearch = jsonBody.stream && jsonBody.model?.includes("Search");
+  if (!isSearch) {
+    if (jsonBody.messages) {
+      jsonBody.messages = [
+        SYSTEM_PROMPT,
+        ...jsonBody.messages.filter((m) => m.role !== "system"),
+      ];
+    } else {
+      jsonBody.messages = [SYSTEM_PROMPT];
+    }
   }
   let searchRes: WebSearchResult | null = null;
-  const isSearch = jsonBody.stream && jsonBody.model?.includes("Search");
-  if (isSearch) {
+  if (isSearch && jsonBody.messages) {
     try {
+      const isAllowedToUseSearch = await allowSearch(
+        req.headers.get("Authorization") || "",
+      );
       const lastIndex = jsonBody.messages.length - 1;
-      if (lastIndex >= 0 && jsonBody.messages[lastIndex].role === "user") {
+      if (
+        isAllowedToUseSearch &&
+        lastIndex >= 0 &&
+        jsonBody.messages[lastIndex].role === "user"
+      ) {
         const lastUserMessage = jsonBody.messages[lastIndex];
         searchRes = await WebSearchTool(lastUserMessage.content);
         jsonBody.messages[lastIndex] = {

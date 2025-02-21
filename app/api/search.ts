@@ -9,6 +9,7 @@ import {
   SearchResultDelta,
   SearchResultDeltaExample,
 } from "../search_templates";
+import { SiliconFlow, SILICONFLOW_BASE_URL } from "../constant";
 
 interface SearchResult {
   url: string;
@@ -119,6 +120,43 @@ const responseExample = {
     videos: null,
   },
 };
+
+const userInfoResponseExample = {
+  code: 20000,
+  message: "OK",
+  status: true,
+  data: {
+    id: "userid",
+    name: "username",
+    image: "user_avatar_image_url",
+    email: "user_email_address",
+    isAdmin: false,
+    balance: "0.88",
+    status: "normal",
+    introduction: "user_introduction",
+    role: "user_role",
+    chargeBalance: "88.00",
+    totalBalance: "88.88",
+  },
+};
+
+export async function allowSearch(Authorization: string): Promise<boolean> {
+  try {
+    const options = { headers: { Authorization: Authorization } };
+    const res: typeof userInfoResponseExample = (
+      await axios.get(
+        `${SILICONFLOW_BASE_URL}/${SiliconFlow.UserInfoPath}`,
+        options,
+      )
+    ).data;
+    const chargeBalance = parseFloat(res.data.chargeBalance);
+    return chargeBalance != 0;
+  } catch (error) {
+    console.error(error);
+    return true;
+  }
+}
+
 export const WebSearchTool = async (
   query: string,
 ): Promise<WebSearchResult> => {

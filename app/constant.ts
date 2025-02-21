@@ -261,6 +261,7 @@ export const SiliconFlow = {
   ExampleEndpoint: SILICONFLOW_BASE_URL,
   ChatPath: "v1/chat/completions",
   ListModelPath: "v1/models?&sub_type=chat",
+  UserInfoPath: "v1/user/info",
   PrivacyPolicyPath: "https://docs.siliconflow.cn/cn/legals/privacy-policy",
   BillPath: "https://cloud.siliconflow.cn/expensebill",
   VerificationPath: "https://cloud.siliconflow.cn/account/authentication",
