@@ -624,7 +624,7 @@ export function streamWithThink(
             responseText = "👀 让我们换个话题聊聊吧";
           }
           if (chunk.search_indexes) {
-            options.onUpdateSearchIndexes(chunk.search_indexes);
+            options.onUpdateSearchIndexes?.(chunk.search_indexes);
           }
           if (chunk.search_results) {
             const getCircledNumber = (num: number): string => {
