@@ -173,7 +173,7 @@ export const WebSearchTool = async (
       apiUrl,
       {
         query: query.length <= 2 ? `${query}  ` : query,
-        freshness: "oneWeek",
+        freshness: "noLimit",
         summary: true,
         count: 10,
       },
