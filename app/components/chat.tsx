@@ -2117,6 +2117,44 @@ function _Chat() {
                             </div>
                           )}
                           <div className={styles["chat-message-item"]}>
+                            {message.search_content && (
+                              <Markdown
+                                key={
+                                  message.streaming
+                                    ? "loading-search_content"
+                                    : "done-search_content"
+                                }
+                                content={message.search_content}
+                                loading={
+                                  (message.preview || message.streaming) &&
+                                  message.search_content.length === 0 &&
+                                  !isUser
+                                }
+                                fontSize={fontSize}
+                                fontFamily={fontFamily}
+                                parentRef={scrollRef}
+                                defaultShow={i >= messages.length - 6}
+                              />
+                            )}
+                            {message.reasoning_content && (
+                              <Markdown
+                                key={
+                                  message.streaming
+                                    ? "loading-reasoning_content"
+                                    : "done-reasoning_content"
+                                }
+                                content={message.reasoning_content}
+                                loading={
+                                  (message.preview || message.streaming) &&
+                                  message.reasoning_content.length === 0 &&
+                                  !isUser
+                                }
+                                fontSize={fontSize}
+                                fontFamily={fontFamily}
+                                parentRef={scrollRef}
+                                defaultShow={i >= messages.length - 6}
+                              />
+                            )}
                             <Markdown
                               key={message.streaming ? "loading" : "done"}
                               content={getMessageTextContent(message)}

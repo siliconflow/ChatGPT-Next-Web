@@ -41,6 +41,7 @@ import { collectModelsWithDefaultModel } from "../utils/model";
 import { createEmptyMask, Mask } from "./mask";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
+import { SearchIndexes } from "../search_templates";
 
 const localStorage = safeLocalStorage();
 
@@ -66,6 +67,9 @@ export type ChatMessage = RequestMessage & {
   tools?: ChatMessageTool[];
   audio_url?: string;
   isMcpResponse?: boolean;
+  reasoning_content?: string;
+  search_content?: string;
+  search_indexes?: SearchIndexes;
 };
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
@@ -448,32 +452,23 @@ export const useChatStore = createPersistStore(
         const sendMessages = recentMessages.concat(userMessage);
         const isSearch = modelConfig.model.toLowerCase().includes("search");
         const isThinking = modelConfig.model.toLowerCase().includes("r1");
-        const msgParams = {
-          role: botMessage.role,
-          streaming: botMessage.streaming,
-          model: botMessage.model,
-        };
-        const thinkingMessage = createMessage(msgParams);
-        const searchMessage = createMessage(msgParams);
-        const searchMessages = isSearch ? [searchMessage] : [];
-        const thinkingMessages = isThinking ? [thinkingMessage] : [];
-        const messageIndex =
-          session.messages.length +
-          1 +
-          (isSearch ? 1 : 0) +
-          (isThinking ? 1 : 0);
-
+        const messageIndex = session.messages.length + 1;
+        if (isThinking) {
+          botMessage.reasoning_content = "";
+        }
+        if (isSearch) {
+          botMessage.search_content = "";
+        }
         // save user's and bot's message
         get().updateTargetSession(session, (session) => {
           const savedUserMessage = {
             ...userMessage,
             content: mContent,
           };
-          session.messages = session.messages
-            .concat([savedUserMessage])
-            .concat(searchMessages)
-            .concat(thinkingMessages)
-            .concat([botMessage]);
+          session.messages = session.messages.concat([
+            savedUserMessage,
+            botMessage,
+          ]);
         });
         const api: ClientApi = getClientApi(modelConfig.providerName);
         // make request
@@ -481,18 +476,26 @@ export const useChatStore = createPersistStore(
           messages: sendMessages,
           config: { ...modelConfig, stream: true },
           onUpdateThinking(message) {
-            thinkingMessage.streaming = true;
             if (message) {
-              thinkingMessage.content = message;
+              botMessage.reasoning_content = message;
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
             });
           },
           onUpdateSearch(message) {
-            searchMessage.streaming = true;
+            botMessage.streaming = true;
             if (message) {
-              searchMessage.content = message;
+              botMessage.search_content = message;
+            }
+            get().updateTargetSession(session, (session) => {
+              session.messages = session.messages.concat();
+            });
+          },
+          onUpdateSearchIndexes(searchIndexes: SearchIndexes) {
+            botMessage.streaming = true;
+            if (searchIndexes) {
+              botMessage.search_indexes = searchIndexes;
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();

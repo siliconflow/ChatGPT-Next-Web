@@ -24,6 +24,7 @@ import { DeepSeekApi } from "./platforms/deepseek";
 import { XAIApi } from "./platforms/xai";
 import { ChatGLMApi } from "./platforms/glm";
 import { SiliconflowApi } from "./platforms/siliconflow";
+import { SearchIndexes } from "../search_templates";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
@@ -74,6 +75,7 @@ export interface ChatOptions {
   onUpdate?: (message: string, chunk: string) => void;
   onUpdateThinking?: (message: string, chunk: string) => void;
   onUpdateSearch?: (message: string, chunk: string) => void;
+  onUpdateSearchIndexes?: (searchIndexes: SearchIndexes) => void;
   onFinish: (message: string, responseRes: Response) => void;
   onError?: (err: Error) => void;
   onController?: (controller: AbortController) => void;
