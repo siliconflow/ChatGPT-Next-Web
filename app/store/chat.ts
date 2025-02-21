@@ -514,10 +514,7 @@ export const useChatStore = createPersistStore(
           onUpdateSearch(message) {
             botMessage.streaming = true;
             if (message) {
-              botMessage.search_content = replaceCitations(
-                message,
-                botMessage.search_indexes,
-              );
+              botMessage.search_content = message;
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
@@ -535,7 +532,10 @@ export const useChatStore = createPersistStore(
           onUpdate(message) {
             botMessage.streaming = true;
             if (message) {
-              botMessage.content = message;
+              botMessage.content = replaceCitations(
+                message,
+                botMessage.search_indexes,
+              );
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
