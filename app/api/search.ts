@@ -17,6 +17,7 @@ interface SearchResult {
   publishedAt: string;
   siteName: string;
   siteIcon: string;
+  summary?: string;
 }
 
 export type WebSearchResult = {
@@ -32,7 +33,7 @@ const formatSearchResult = (result: SearchResult, index: number): string =>
   `[webpage ${index} begin]\n` +
   `URL: ${result.url}\n` +
   `title: ${result.title}\n` +
-  `snippet: ${result.snippet}\n` +
+  `snippet: ${result.summary || result.snippet}\n` +
   `published_at: ${result.publishedAt}\n` +
   `site_name: ${result.siteName}\n` +
   `site_icon: ${result.siteIcon}\n` +
