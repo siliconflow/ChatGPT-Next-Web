@@ -405,6 +405,8 @@ export function streamWithThink(
   let remainText = "";
   let responseTextThinking = "";
   let remainTextThinking = "";
+  let responseTextSearch = "";
+  let remainTextSearch = "";
   let finished = false;
   let running = false;
   let runTools: any[] = [];
@@ -417,12 +419,21 @@ export function streamWithThink(
   function animateResponseText() {
     if (finished || controller.signal.aborted) {
       responseTextThinking += remainTextThinking;
+      responseTextSearch += remainTextSearch;
       responseText += remainText;
       console.log("[Response Animation] finished");
       if (responseText?.length === 0) {
         options.onError?.(new Error("服务器繁忙，请稍后再试"));
       }
       return;
+    }
+
+    if (remainTextSearch.length > 0) {
+      const fetchCount = Math.max(1, Math.round(remainTextSearch.length / 60));
+      const fetchText = remainTextSearch.slice(0, fetchCount);
+      responseTextSearch += fetchText;
+      remainTextSearch = remainTextSearch.slice(fetchCount);
+      options.onUpdateSearch?.(responseTextSearch, fetchText);
     }
 
     if (remainTextThinking.length > 0) {
@@ -650,10 +661,9 @@ export function streamWithThink(
                 result.snippet
               }\n`;
 
-            options.onUpdateSearch?.(
-              chunk.search_results.map(formatMarkdownLink).join("\n"),
-              "",
-            );
+            remainTextSearch = chunk.search_results
+              .map(formatMarkdownLink)
+              .join("\n");
           }
           // Skip if content is empty
           if (!chunk?.content || chunk.content.length === 0) {
