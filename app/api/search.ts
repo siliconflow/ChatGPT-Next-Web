@@ -236,7 +236,7 @@ export const WebSearchTool = async (
       console.error("Server Error:", {
         status: statusCode,
         response: serverResponse,
-        axiosErr: error,
+        axiosErr: error.message,
       });
 
       throw new Error(
