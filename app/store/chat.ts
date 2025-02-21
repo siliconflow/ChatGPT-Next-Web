@@ -471,13 +471,41 @@ export const useChatStore = createPersistStore(
           ]);
         });
         const api: ClientApi = getClientApi(modelConfig.providerName);
+        function replaceCitations(
+          text: string,
+          citations: Array<{ url: string; cite_index: number }> | undefined,
+        ): string {
+          if (!!!citations) {
+            return text;
+          }
+          // Create a mapping from citation index to URL
+          const citationMap = new Map<number, string>();
+          for (const citation of citations) {
+            citationMap.set(citation.cite_index, citation.url);
+          }
+
+          return text.replace(/\[citation:(\d+)\]/g, (match, citeIndexStr) => {
+            const citeIndex = parseInt(citeIndexStr, 10);
+
+            // Convert number to circled Unicode character (❶-❿ for 1-10)
+            const circledChar = String.fromCharCode(0x2775 + citeIndex);
+
+            // Get corresponding URL from citation data
+            const url = citationMap.get(citeIndex);
+
+            return url ? `[${circledChar}](${url})` : match;
+          });
+        }
         // make request
         api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: true },
           onUpdateThinking(message) {
             if (message) {
-              botMessage.reasoning_content = message;
+              botMessage.reasoning_content = replaceCitations(
+                message,
+                botMessage.search_indexes,
+              );
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
@@ -486,7 +514,10 @@ export const useChatStore = createPersistStore(
           onUpdateSearch(message) {
             botMessage.streaming = true;
             if (message) {
-              botMessage.search_content = message;
+              botMessage.search_content = replaceCitations(
+                message,
+                botMessage.search_indexes,
+              );
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
