@@ -1135,6 +1135,11 @@ function _Chat() {
   const session = chatStore.currentSession();
   const config = useAppConfig();
   const fontSize = config.fontSize;
+  let fontSizeThink = fontSize - 2;
+  const DEFAULT_THINK_FONT_SIZE = 12;
+  if (fontSizeThink <= 0) {
+    fontSizeThink = DEFAULT_THINK_FONT_SIZE;
+  }
   const fontFamily = config.fontFamily;
 
   const [showExport, setShowExport] = useState(false);
@@ -2118,42 +2123,49 @@ function _Chat() {
                           )}
                           <div className={styles["chat-message-item"]}>
                             {message.search_content && (
-                              <Markdown
-                                key={
-                                  message.streaming
-                                    ? "loading-search_content"
-                                    : "done-search_content"
-                                }
-                                content={message.search_content}
-                                loading={
-                                  (message.preview || message.streaming) &&
-                                  message.search_content.length === 0 &&
-                                  !isUser
-                                }
-                                fontSize={fontSize}
-                                fontFamily={fontFamily}
-                                parentRef={scrollRef}
-                                defaultShow={i >= messages.length - 6}
-                              />
+                              <>
+                                <Markdown
+                                  key={
+                                    message.streaming
+                                      ? "loading-search_content"
+                                      : "done-search_content"
+                                  }
+                                  content={message.search_content}
+                                  loading={
+                                    (message.preview || message.streaming) &&
+                                    message.search_content.length === 0 &&
+                                    !isUser
+                                  }
+                                  fontSize={fontSizeThink}
+                                  fontFamily={fontFamily}
+                                  parentRef={scrollRef}
+                                  defaultShow={i >= messages.length - 6}
+                                />
+                                <hr />
+                              </>
                             )}
+
                             {message.reasoning_content && (
-                              <Markdown
-                                key={
-                                  message.streaming
-                                    ? "loading-reasoning_content"
-                                    : "done-reasoning_content"
-                                }
-                                content={message.reasoning_content}
-                                loading={
-                                  (message.preview || message.streaming) &&
-                                  message.reasoning_content.length === 0 &&
-                                  !isUser
-                                }
-                                fontSize={fontSize}
-                                fontFamily={fontFamily}
-                                parentRef={scrollRef}
-                                defaultShow={i >= messages.length - 6}
-                              />
+                              <>
+                                <Markdown
+                                  key={
+                                    message.streaming
+                                      ? "loading-reasoning_content"
+                                      : "done-reasoning_content"
+                                  }
+                                  content={message.reasoning_content}
+                                  loading={
+                                    (message.preview || message.streaming) &&
+                                    message.reasoning_content.length === 0 &&
+                                    !isUser
+                                  }
+                                  fontSize={fontSizeThink}
+                                  fontFamily={fontFamily}
+                                  parentRef={scrollRef}
+                                  defaultShow={i >= messages.length - 6}
+                                />
+                                <hr />
+                              </>
                             )}
                             <Markdown
                               key={message.streaming ? "loading" : "done"}
