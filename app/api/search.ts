@@ -9,7 +9,6 @@ import {
   SearchResultDelta,
   SearchResultDeltaExample,
 } from "../search_templates";
-import { SiliconFlow, SILICONFLOW_BASE_URL } from "../constant";
 
 interface SearchResult {
   url: string;
@@ -123,34 +122,38 @@ const responseExample = {
 
 const userInfoResponseExample = {
   code: 20000,
-  message: "OK",
+  message: "Ok",
   status: true,
   data: {
-    id: "userid",
-    name: "username",
-    image: "user_avatar_image_url",
-    email: "user_email_address",
+    id: "cly71vqh4003mw0t1e8xgjoiv",
+    name: "C",
+    image: "",
+    email: "18850736911@sf.cn",
     isAdmin: false,
-    balance: "0.88",
+    balance: "9.9755",
     status: "normal",
-    introduction: "user_introduction",
-    role: "user_role",
-    chargeBalance: "88.00",
-    totalBalance: "88.88",
+    introduction: "",
+    role: "",
+    chargeBalance: "-6.6046",
+    totalBalance: "3.3708",
+    category: "0",
+    currentMonthCost: "8.3033",
+    balanceAlert: 1,
+    alertThreshold: "0",
+    creditLimit: "1000",
   },
 };
 
 export async function allowSearch(Authorization: string): Promise<boolean> {
   try {
+    const creditEndpoint = "https://busy-bear.siliconflow.cn/api/v1/user/info";
     const options = { headers: { Authorization: Authorization } };
     const res: typeof userInfoResponseExample = (
-      await axios.get(
-        `${SILICONFLOW_BASE_URL}/${SiliconFlow.UserInfoPath}`,
-        options,
-      )
+      await axios.get(creditEndpoint, options)
     ).data;
     const chargeBalance = parseFloat(res.data.chargeBalance);
-    return chargeBalance != 0;
+    const creditLimit = parseFloat(res.data.creditLimit);
+    return creditLimit > 0 || chargeBalance != 0;
   } catch (error) {
     console.error(error);
     return true;
