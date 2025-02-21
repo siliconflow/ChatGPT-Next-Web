@@ -141,6 +141,7 @@ export function ArtifactsShareButton({
           .catch((e) => {
             showToast(Locale.Export.Artifacts.Error);
           });
+  return <></>;
   return (
     <>
       <div className="window-action-button" style={style}>
