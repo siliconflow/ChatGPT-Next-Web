@@ -614,7 +614,8 @@ export function streamWithThink(
         try {
           const chunk = parseSSE(text, runTools);
           if (!!chunk.shouldRecall) {
-            responseText = "👀 让我们换个话题聊聊吧";
+            options.onRecall?.("👀 让我们换个话题聊聊吧");
+            finish();
           }
           if (chunk.search_indexes) {
             options.onUpdateSearchIndexes?.(chunk.search_indexes);

@@ -76,6 +76,7 @@ export interface ChatOptions {
   onUpdateThinking?: (message: string, chunk: string) => void;
   onUpdateSearch?: (message: string, chunk: string) => void;
   onUpdateSearchIndexes?: (searchIndexes: SearchIndexes) => void;
+  onRecall?: (notice: string) => void;
   onFinish: (message: string, responseRes: Response) => void;
   onError?: (err: Error) => void;
   onController?: (controller: AbortController) => void;

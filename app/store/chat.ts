@@ -534,6 +534,11 @@ export const useChatStore = createPersistStore(
               session.messages = session.messages.concat();
             });
           },
+          onRecall(notice) {
+            botMessage.content = notice;
+            botMessage.reasoning_content = undefined;
+            botMessage.search_content = undefined;
+          },
           async onFinish(message) {
             botMessage.streaming = false;
             if (message) {
