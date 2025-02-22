@@ -265,5 +265,6 @@ export const getServerSideConfig = () => {
     visionModels,
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
+    isConf: !!process.env.SILICONFLOW_API_KEY,
   };
 };

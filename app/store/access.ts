@@ -148,6 +148,7 @@ const DEFAULT_ACCESS_STATE = {
 
   // tts config
   edgeTTSVoiceName: "zh-CN-YunxiNeural",
+  isConf: false,
 };
 
 export const useAccessStore = createPersistStore(
@@ -222,6 +223,10 @@ export const useAccessStore = createPersistStore(
     isValidSiliconFlow() {
       this.fetch();
       return ensure(get(), ["siliconflowApiKey"]);
+    },
+
+    isConf() {
+      return get().isConf;
     },
 
     isAuthorized() {

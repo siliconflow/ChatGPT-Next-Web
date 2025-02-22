@@ -103,7 +103,7 @@ export function AuthPage() {
 
   const [isCountdownCanceledOrFinished, setIsCountdownCanceledOrFinished] =
     useState(false);
-  const COUNT_DOWN_SECONDS = 5;
+  const COUNT_DOWN_SECONDS = 7;
   const [countDownSeconds, setCountDownSeconds] = useState(COUNT_DOWN_SECONDS);
   const timer = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
@@ -117,7 +117,7 @@ export function AuthPage() {
 
     for (let i = 1; i <= COUNT_DOWN_SECONDS; i++) {
       setTimeout(() => {
-        setCountDownSeconds(5 - i);
+        setCountDownSeconds(COUNT_DOWN_SECONDS - i);
       }, i * 1000);
     }
     return () => {

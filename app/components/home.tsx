@@ -173,7 +173,9 @@ function Screen() {
   const shouldTightBorder =
     getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(
-    () => !useAccessStore.getState().isValidSiliconFlow(),
+    () =>
+      !useAccessStore.getState().isValidSiliconFlow() &&
+      !useAccessStore.getState().isConf(),
   );
   useEffect(() => {
     loadAsyncGoogleFont();
@@ -182,8 +184,15 @@ function Screen() {
         console.log("SiliconFlow API Key changed", state.siliconflowApiKey);
         setShowAuthModal(!state.siliconflowApiKey);
       }
+      if (state.isConf !== prevState.isConf) {
+        console.log("isConf changed", state.isConf);
+        setShowAuthModal(!state.isConf);
+      }
     });
-    setShowAuthModal(!useAccessStore.getState().isValidSiliconFlow());
+    setShowAuthModal(
+      !useAccessStore.getState().isValidSiliconFlow() &&
+        !useAccessStore.getState().isConf(),
+    );
     return sub;
   }, []);
   if (isArtifact) {
