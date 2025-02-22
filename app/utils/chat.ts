@@ -407,6 +407,7 @@ export function streamWithThink(
   let responseTextSearch = "";
   let remainTextSearch = "";
   let finished = false;
+  let recalled = false;
   let running = false;
   let runTools: any[] = [];
   let responseRes: Response;
@@ -421,7 +422,7 @@ export function streamWithThink(
       responseTextSearch += remainTextSearch;
       responseText += remainText;
       console.log("[Response Animation] finished");
-      if (responseText?.length === 0) {
+      if (responseText?.length === 0 && !recalled) {
         options.onError?.(new Error("服务器繁忙，请稍后再试"));
       }
       return;
@@ -615,6 +616,7 @@ export function streamWithThink(
           const chunk = parseSSE(text, runTools);
           if (!!chunk.shouldRecall) {
             options.onRecall?.("👀 让我们换个话题聊聊吧");
+            recalled = true;
             finish();
           }
           if (chunk.search_indexes) {
