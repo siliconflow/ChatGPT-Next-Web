@@ -1,0 +1,8 @@
+:8000 {
+	reverse_proxy https://api.siliconflow.cn {
+	}
+	log {
+		output stderr
+		level DEBUG
+	}
+}
