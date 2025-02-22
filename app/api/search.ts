@@ -9,6 +9,7 @@ import {
   SearchResultDelta,
   SearchResultDeltaExample,
 } from "../search_templates";
+import { getServerSideConfig } from "../config/server";
 
 interface SearchResult {
   url: string;
@@ -145,6 +146,10 @@ const userInfoResponseExample = {
 };
 
 export async function allowSearch(Authorization: string): Promise<boolean> {
+  if (getServerSideConfig().isConf) {
+    console.log("conf mode, skipping credit check for search");
+    return true;
+  }
   try {
     const creditEndpoint = "https://busy-bear.siliconflow.cn/api/v1/user/info";
     const options = { headers: { Authorization: Authorization } };
