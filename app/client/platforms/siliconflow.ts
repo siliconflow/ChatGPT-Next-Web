@@ -6,6 +6,7 @@ import {
   SiliconFlow,
   DEFAULT_MODELS,
   REQUEST_TIMEOUT_MS_FOR_THINKING,
+  SILICONCHAT_BASE_URL,
 } from "@/app/constant";
 import {
   useAccessStore,
@@ -44,7 +45,7 @@ export interface SiliconFlowListModelResponse {
 export class SiliconflowApi implements LLMApi {
   private disableListModels = true;
 
-  path(path: string): string {
+  path(path: string, opts: { isSearch?: boolean } = {}): string {
     const accessStore = useAccessStore.getState();
 
     let baseUrl = "";
@@ -73,6 +74,9 @@ export class SiliconflowApi implements LLMApi {
     // If we are building on Vercel, directly access to SiliconFlow API for better performance
     if (isVercelBuild || !path.includes(SiliconFlow.ChatPath)) {
       baseUrl = SILICONFLOW_BASE_URL;
+    }
+    if (isVercelBuild && opts.isSearch) {
+      baseUrl = SILICONCHAT_BASE_URL;
     }
 
     console.log("[Proxy Endpoint] ", baseUrl, path);
@@ -131,7 +135,9 @@ export class SiliconflowApi implements LLMApi {
     options.onController?.(controller);
 
     try {
-      const chatPath = this.path(SiliconFlow.ChatPath);
+      const chatPath = this.path(SiliconFlow.ChatPath, {
+        isSearch: modelConfig.model.endsWith("-Search"),
+      });
       const chatPayload = {
         method: "POST",
         body: JSON.stringify(requestPayload),
