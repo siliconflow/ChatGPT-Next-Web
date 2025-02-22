@@ -425,6 +425,9 @@ export function streamWithThink(
       if (responseText?.length === 0 && !recalled) {
         options.onError?.(new Error("服务器繁忙，请稍后再试"));
       }
+      if (recalled) {
+        options.onError?.(new Error("Recall"));
+      }
       return;
     }
 
@@ -615,7 +618,7 @@ export function streamWithThink(
         try {
           const chunk = parseSSE(text, runTools);
           if (!!chunk.shouldRecall) {
-            options.onRecall?.("👀 让我们换个话题聊聊吧");
+            options.onRecall?.();
             recalled = true;
             finish();
           }

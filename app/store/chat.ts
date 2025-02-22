@@ -534,8 +534,7 @@ export const useChatStore = createPersistStore(
               session.messages = session.messages.concat();
             });
           },
-          onRecall(notice) {
-            botMessage.content = notice;
+          onRecall() {
             botMessage.reasoning_content = undefined;
             botMessage.search_content = undefined;
           },

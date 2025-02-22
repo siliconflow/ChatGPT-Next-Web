@@ -7,6 +7,9 @@ export function prettyObject(msg: any) {
   if (msg.code === 50603) {
     return `⚠️系统繁忙，请稍后重试`;
   }
+  if (msg.message === "Recall") {
+    return "👀 让我们换个话题聊聊吧";
+  }
   const obj = msg;
   if (typeof msg !== "string") {
     msg = JSON.stringify(msg, null, "  ");
