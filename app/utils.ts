@@ -258,13 +258,7 @@ export function getMessageTextContentWithoutThinking(message: RequestMessage) {
       }
     }
   }
-
-  // Filter out thinking lines (starting with "> ")
-  return content
-    .split("\n")
-    .filter((line) => !line.startsWith("> ") && line.trim() !== "")
-    .join("\n")
-    .trim();
+  return content;
 }
 
 export function getMessageImages(message: RequestMessage): string[] {
