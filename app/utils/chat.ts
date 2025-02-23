@@ -9,7 +9,7 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from "@fortaine/fetch-event-source";
-import { prettyObject } from "./format";
+import { MsgError, prettyObject } from "./format";
 import { fetch as tauriFetch } from "./stream";
 import {
   SearchIndexes,
@@ -422,11 +422,18 @@ export function streamWithThink(
       responseTextSearch += remainTextSearch;
       responseText += remainText;
       console.log("[Response Animation] finished");
-      if (responseText?.length === 0 && !recalled) {
-        options.onError?.(new Error("服务器繁忙，请稍后再试"));
+      if (
+        responseTextThinking?.length === 0 &&
+        responseTextSearch?.length === 0 &&
+        responseText?.length === 0 &&
+        !recalled
+      ) {
+        const msgError: MsgError = "Empty";
+        options.onError?.(new Error(msgError));
       }
       if (recalled) {
-        options.onError?.(new Error("Recall"));
+        const msgError: MsgError = "Recall";
+        options.onError?.(new Error(msgError));
       }
       return;
     }

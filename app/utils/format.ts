@@ -1,5 +1,7 @@
 import { SiliconFlow } from "../constant";
 
+export type MsgError = "Recall" | "Empty";
+export const EmptyMsg = "🤔 仿佛来到了信息的荒漠 ...";
 export function prettyObject(msg: any) {
   if (msg.code === 30001 || msg.code === 30011) {
     return `⚠️ 不好，余额不足了，请先完成充值 👉 [立即充值](${SiliconFlow.BillPath})`;
@@ -7,8 +9,11 @@ export function prettyObject(msg: any) {
   if (msg.code === 50603) {
     return `⚠️系统繁忙，请稍后重试`;
   }
-  if (msg.message === "Recall") {
+  if ((msg.message as MsgError) === "Recall") {
     return "👀 让我们换个话题聊聊吧";
+  }
+  if ((msg.message as MsgError) === "Empty") {
+    return EmptyMsg;
   }
   const obj = msg;
   if (typeof msg !== "string") {
