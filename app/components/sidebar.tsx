@@ -257,8 +257,12 @@ export function SideBar(props: { className?: string }) {
       {...props}
     >
       <SideBarHeader
-        title="SiliconChat"
-        subTitle="你触手可及的AI伙伴"
+        title={accessStore.isConfMode() ? "SiliconFlow" : "SiliconChat"}
+        subTitle={
+          accessStore.isConfMode()
+            ? "Accelerate AGI to Benefit Humanity"
+            : "你触手可及的AI伙伴"
+        }
         logo={<ChatGptIcon />}
         shouldNarrow={shouldNarrow}
       >

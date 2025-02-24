@@ -175,23 +175,23 @@ function Screen() {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(
     () =>
       !useAccessStore.getState().isValidSiliconFlow() &&
-      !useAccessStore.getState().isConf(),
+      !useAccessStore.getState().isConfMode(),
   );
   useEffect(() => {
     loadAsyncGoogleFont();
     const sub = useAccessStore.subscribe((state, prevState) => {
       if (
         state.siliconflowApiKey !== prevState.siliconflowApiKey ||
-        state.isConf !== prevState.isConf
+        state.isConfMode !== prevState.isConfMode
       ) {
         console.log("SiliconFlow API Key may change");
-        console.log("isConf may change", state.isConf);
-        setShowAuthModal(!state.isConf && !state.siliconflowApiKey);
+        console.log("isConf may change", state.isConfMode);
+        setShowAuthModal(!state.isConfMode && !state.siliconflowApiKey);
       }
     });
     setShowAuthModal(
       !useAccessStore.getState().isValidSiliconFlow() &&
-        !useAccessStore.getState().isConf(),
+        !useAccessStore.getState().isConfMode(),
     );
     return sub;
   }, []);

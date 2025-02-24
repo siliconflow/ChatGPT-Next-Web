@@ -225,7 +225,7 @@ export const useAccessStore = createPersistStore(
       return ensure(get(), ["siliconflowApiKey"]);
     },
 
-    isConf() {
+    isConfMode() {
       return get().isConf;
     },
 
