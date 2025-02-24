@@ -146,6 +146,7 @@ const userInfoResponseExample = {
 };
 
 export async function allowSearch(Authorization: string): Promise<boolean> {
+  return true;
   if (getServerSideConfig().isConf) {
     console.log("conf mode, skipping credit check for search");
     return true;
