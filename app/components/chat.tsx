@@ -703,16 +703,6 @@ export function ChatActions(props: {
           />
         )}
         <ChatActionFull
-          icon={<ThinkIcon />}
-          onClick={() => {
-            const newDeepThinking = !isDeepThinking;
-            setDeepThinking(newDeepThinking);
-            updateModel(newDeepThinking, isPro, isSearch);
-          }}
-          text={"深度思考"}
-          active={isDeepThinking}
-        />
-        <ChatActionFull
           icon={<ProIcon />}
           onClick={() => {
             const newPro = !isPro;
@@ -723,13 +713,23 @@ export function ChatActions(props: {
           active={isPro}
         />
         <ChatActionFull
+          icon={<ThinkIcon />}
+          onClick={() => {
+            const newDeepThinking = !isDeepThinking;
+            setDeepThinking(newDeepThinking);
+            updateModel(newDeepThinking, isPro, isSearch);
+          }}
+          text={isMobileScreen ? "思考" : "深度思考"}
+          active={isDeepThinking}
+        />
+        <ChatActionFull
           icon={<SearchIcon />}
           onClick={() => {
             const newSearch = !isSearch;
             setSearch(newSearch);
             updateModel(isDeepThinking, isPro, newSearch);
           }}
-          text={"联网搜索"}
+          text={isMobileScreen ? "联网" : "联网搜索"}
           active={isSearch}
         />
         {!props.hitBottom && (
