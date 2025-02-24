@@ -267,6 +267,7 @@ export const SiliconFlow = {
   UserInfoPath: "v1/user/info",
   PrivacyPolicyPath: "https://docs.siliconflow.cn/cn/legals/privacy-policy",
   BillPath: "https://cloud.siliconflow.cn/expensebill",
+  InternationalHomePage: "https://siliconflow.com",
   VerificationPath: "https://cloud.siliconflow.cn/account/authentication",
   SummaryModels: [
     "Qwen/Qwen2.5-7B-Instruct",

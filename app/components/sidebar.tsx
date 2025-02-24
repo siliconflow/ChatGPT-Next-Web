@@ -180,6 +180,7 @@ export function SideBarHeader(props: {
   shouldNarrow?: boolean;
 }) {
   const { title, subTitle, logo, children, shouldNarrow } = props;
+  const accessStore = useAccessStore();
   return (
     <Fragment>
       <div
@@ -187,6 +188,11 @@ export function SideBarHeader(props: {
           [styles["sidebar-header-narrow"]]: shouldNarrow,
         })}
         data-tauri-drag-region
+        onClick={() => {
+          if (accessStore.isConfMode()) {
+            window.open(SiliconFlow.InternationalHomePage, "_blank");
+          }
+        }}
       >
         <div className={styles["sidebar-title-container"]}>
           <div className={styles["sidebar-title"]} data-tauri-drag-region>
