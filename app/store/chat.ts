@@ -471,24 +471,6 @@ export const useChatStore = createPersistStore(
           ]);
         });
         const api: ClientApi = getClientApi(modelConfig.providerName);
-        function replaceCitations(
-          text: string,
-          citations: Array<{ url: string; cite_index: number }> | undefined,
-        ): string {
-          if (!!!citations) {
-            return text;
-          }
-          const citationMap = new Map<number, string>();
-          for (const citation of citations) {
-            citationMap.set(citation.cite_index, citation.url);
-          }
-          return text.replace(/\[citation:(\d+)\]/g, (match, citeIndexStr) => {
-            const citeIndex = parseInt(citeIndexStr, 10);
-            const circledChar = String.fromCharCode(0x2775 + citeIndex);
-            const url = citationMap.get(citeIndex);
-            return url ? `[${circledChar}](${url})` : match;
-          });
-        }
         // make request
         api.llm.chat({
           messages: sendMessages,
@@ -513,10 +495,7 @@ export const useChatStore = createPersistStore(
           },
           onUpdateThinking(message) {
             if (message) {
-              botMessage.reasoning_content = replaceCitations(
-                message,
-                botMessage.search_indexes,
-              );
+              botMessage.reasoning_content = message;
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
@@ -525,10 +504,7 @@ export const useChatStore = createPersistStore(
           onUpdate(message) {
             botMessage.streaming = true;
             if (message) {
-              botMessage.content = replaceCitations(
-                message,
-                botMessage.search_indexes,
-              );
+              botMessage.content = message;
             }
             get().updateTargetSession(session, (session) => {
               session.messages = session.messages.concat();
@@ -541,10 +517,7 @@ export const useChatStore = createPersistStore(
           async onFinish(message) {
             botMessage.streaming = false;
             if (message) {
-              botMessage.content = replaceCitations(
-                message,
-                botMessage.search_indexes,
-              );
+              botMessage.content = message;
               botMessage.date = new Date().toLocaleString();
               get().onNewMessage(botMessage, session);
             }

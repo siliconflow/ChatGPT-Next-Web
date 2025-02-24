@@ -1944,6 +1944,26 @@ function _Chat() {
                 // TODO
                 // .filter((m) => !m.isMcpResponse)
                 .map((message, i) => {
+                  function replaceCitations(text: string): string {
+                    if (!!!message.search_indexes) {
+                      return text;
+                    }
+                    const citationMap = new Map<number, string>();
+                    for (const citation of message.search_indexes) {
+                      citationMap.set(citation.cite_index, citation.url);
+                    }
+                    return text.replace(
+                      /\[citation:(\d+)\]/g,
+                      (match, citeIndexStr) => {
+                        const citeIndex = parseInt(citeIndexStr, 10);
+                        const circledChar = String.fromCharCode(
+                          0x2775 + citeIndex,
+                        );
+                        const url = citationMap.get(citeIndex);
+                        return url ? `[${circledChar}](${url})` : match;
+                      },
+                    );
+                  }
                   const isUser = message.role === "user";
                   const isContext = i < context.length;
                   const showActions =
@@ -2161,7 +2181,9 @@ function _Chat() {
                                       ? "loading-reasoning_content"
                                       : "done-reasoning_content"
                                   }
-                                  content={message.reasoning_content}
+                                  content={replaceCitations(
+                                    message.reasoning_content,
+                                  )}
                                   loading={
                                     (message.preview || message.streaming) &&
                                     message.reasoning_content.length === 0 &&
@@ -2177,7 +2199,9 @@ function _Chat() {
                             )}
                             <Markdown
                               key={message.streaming ? "loading" : "done"}
-                              content={getMessageTextContent(message)}
+                              content={replaceCitations(
+                                getMessageTextContent(message),
+                              )}
                               loading={
                                 (message.preview || message.streaming) &&
                                 message.content.length === 0 &&
