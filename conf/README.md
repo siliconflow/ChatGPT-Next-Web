@@ -19,5 +19,5 @@ podman run --rm -p 3000:3000 --env-file .env oneflowinc/silicon-chat
 
 ### 注意事项
 - `SILICONFLOW_URL` 是 SiliconLLM 实例的地址，如果是本地运行的 SiliconLLM，如果没有 https，需要在前面加上 `http://`， 否则会自动认为是 https 导致错误
-- 即时这个 SiliconLLM 实例不需要 API Key，也需要填写一个非空的 `SILICONFLOW_API_KEY` 环境变量让前端跳过认证。
+- 即使这个 SiliconLLM 实例不需要 API Key，也需要填写一个非空的 `SILICONFLOW_API_KEY` 环境变量让前端跳过认证。
 - 也可以不创建 env 文件，直接使用 docker run 的 `--env` 参数传入环境变量。
