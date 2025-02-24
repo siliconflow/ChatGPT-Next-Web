@@ -697,7 +697,7 @@ const chatglmModels = [
   //   "cogvideox-flash", // free
 ];
 
-const siliconflowModels = [
+const siliconflowModels_ = [
   "Qwen/Qwen2.5-7B-Instruct",
   "Qwen/Qwen2.5-72B-Instruct",
   "deepseek-ai/DeepSeek-R1",
@@ -711,9 +711,13 @@ const siliconflowModels = [
   "meta-llama/Llama-3.3-70B-Instruct",
   "THUDM/glm-4-9b-chat",
   "Pro/deepseek-ai/DeepSeek-R1",
-  "Pro/deepseek-ai/DeepSeek-R1-Search",
+  "Pro/deepseek-ai/DeepSeek-R1",
   "Pro/deepseek-ai/DeepSeek-V3",
 ];
+
+const siliconflowModels = siliconflowModels_.concat(
+  siliconflowModels_.map((m) => `${m}-Search`),
+);
 
 let seq = 1000; // 内置的模型序号生成器从1000开始
 export const DEFAULT_MODELS = [

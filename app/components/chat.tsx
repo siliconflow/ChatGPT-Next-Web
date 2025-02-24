@@ -707,14 +707,7 @@ export function ChatActions(props: {
           onClick={() => {
             const newDeepThinking = !isDeepThinking;
             setDeepThinking(newDeepThinking);
-
-            let newSearch = isSearch;
-            if (!newDeepThinking) {
-              newSearch = newDeepThinking;
-              setSearch(newSearch);
-            }
-
-            updateModel(newDeepThinking, isPro, newSearch);
+            updateModel(newDeepThinking, isPro, isSearch);
           }}
           text={"深度思考"}
           active={isDeepThinking}
@@ -724,14 +717,7 @@ export function ChatActions(props: {
           onClick={() => {
             const newPro = !isPro;
             setPro(newPro);
-
-            let newSearch = isSearch;
-            if (!newPro) {
-              newSearch = newPro;
-              setSearch(newSearch);
-            }
-
-            updateModel(isDeepThinking, newPro, newSearch);
+            updateModel(isDeepThinking, newPro, isSearch);
           }}
           text={"Pro"}
           active={isPro}
@@ -741,13 +727,7 @@ export function ChatActions(props: {
           onClick={() => {
             const newSearch = !isSearch;
             setSearch(newSearch);
-            if (newSearch) {
-              setPro(true);
-              setDeepThinking(true);
-              updateModel(true, true, newSearch);
-            } else {
-              updateModel(isDeepThinking, isPro, newSearch);
-            }
+            updateModel(isDeepThinking, isPro, newSearch);
           }}
           text={"联网搜索"}
           active={isSearch}
