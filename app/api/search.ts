@@ -126,10 +126,10 @@ const userInfoResponseExample = {
   message: "Ok",
   status: true,
   data: {
-    id: "cly71vqh4003mw0t1e8xgjoiv",
+    id: "example_id",
     name: "C",
     image: "",
-    email: "18850736911@sf.cn",
+    email: "123@sf.cn",
     isAdmin: false,
     balance: "9.9755",
     status: "normal",
