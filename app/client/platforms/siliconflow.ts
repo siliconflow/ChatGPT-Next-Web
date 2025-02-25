@@ -72,7 +72,7 @@ export class SiliconflowApi implements LLMApi {
 
     const isVercelBuild = !!getClientConfig()?.isVercelBuild;
     baseUrl = SILICONFLOW_BASE_URL;
-    if (opts.isSearch) {
+    if (opts.isSearch || accessStore.isConfMode()) {
       baseUrl = ApiPath.SiliconFlow;
     }
     if (opts.isSearch && isVercelBuild) {
