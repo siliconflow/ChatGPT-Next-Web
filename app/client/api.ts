@@ -354,6 +354,8 @@ export function getHeaders(ignoreHeaders: boolean = false) {
     );
   }
 
+  headers["X-SiliconCloud-Source"] = "chat";
+
   return headers;
 }
 
