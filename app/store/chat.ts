@@ -609,7 +609,7 @@ export const useChatStore = createPersistStore(
           t = DEFAULT_SYSTEM_TEMPLATE_V3;
         if (session.mask.modelConfig.model.toLowerCase().includes("r1"))
           t = DEFAULT_SYSTEM_TEMPLATE_R1;
-        if (shouldInjectSystemPrompts || 1) {
+        if (shouldInjectSystemPrompts) {
           systemPrompts = [
             createMessage({
               role: "system",
