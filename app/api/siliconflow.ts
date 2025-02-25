@@ -147,16 +147,6 @@ async function request(req: NextRequest) {
     }),
   };
   const isSearch = jsonBody.stream && jsonBody.model?.includes("Search");
-  if (!isSearch) {
-    if (jsonBody.messages) {
-      jsonBody.messages = [
-        SYSTEM_PROMPT,
-        ...jsonBody.messages.filter((m) => m.role !== "system"),
-      ];
-    } else {
-      jsonBody.messages = [SYSTEM_PROMPT];
-    }
-  }
   let searchRes: WebSearchResult | null = null;
   if (isSearch && jsonBody.messages) {
     try {
