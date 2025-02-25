@@ -4,15 +4,11 @@ import {
   ApiPath,
   ModelProvider,
   ServiceProvider,
-  DEFAULT_SYSTEM_TEMPLATE,
-  DEFAULT_SYSTEM_TEMPLATE_R1,
-  DEFAULT_SYSTEM_TEMPLATE_V3,
 } from "@/app/constant";
 import { prettyObject } from "@/app/utils/format";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/api/auth";
 import { isModelNotavailableInServer } from "@/app/utils/model";
-import { RequestMessage } from "../typing";
 
 import {
   EventStreamContentType,
@@ -50,40 +46,6 @@ export async function handle(
     console.error("[SiliconFlow] ", e);
     return NextResponse.json(prettyObject(e));
   }
-}
-
-export function fillTemplateWith(
-  input: string,
-  modelConfig: { model: string; template?: string },
-) {
-  // Find the model in the DEFAULT_MODELS array that matches the modelConfig.model
-  const vars = {
-    ServiceProvider: ServiceProvider.SiliconFlow,
-    model: modelConfig.model,
-    time: new Date().toString(),
-    input: input,
-    current_date: new Date().toLocaleDateString(),
-  };
-
-  let output = modelConfig.template ?? DEFAULT_SYSTEM_TEMPLATE;
-
-  // remove duplicate
-  if (input.startsWith(output)) {
-    output = "";
-  }
-
-  // must contains {{input}}
-  const inputVar = "{{input}}";
-  if (!output.includes(inputVar)) {
-    output += "\n" + inputVar;
-  }
-
-  Object.entries(vars).forEach(([name, value]) => {
-    const regex = new RegExp(`{{${name}}}`, "g");
-    output = output.replace(regex, value.toString()); // Ensure value is a string
-  });
-
-  return output;
 }
 
 async function request(req: NextRequest) {
@@ -132,19 +94,6 @@ async function request(req: NextRequest) {
     model?: string;
     messages?: Array<{ role: string; content: string }>;
     stream?: boolean;
-  };
-
-  let t = DEFAULT_SYSTEM_TEMPLATE;
-  if (jsonBody.model?.toLowerCase().includes("v3"))
-    t = DEFAULT_SYSTEM_TEMPLATE_V3;
-  if (jsonBody.model?.toLowerCase().includes("r1"))
-    t = DEFAULT_SYSTEM_TEMPLATE_R1;
-  const SYSTEM_PROMPT: RequestMessage = {
-    role: "system",
-    content: fillTemplateWith("", {
-      template: t,
-      model: (jsonBody.model || "").replace("Pro/", ""),
-    }),
   };
   const isSearch = jsonBody.stream && jsonBody.model?.includes("Search");
   let searchRes: WebSearchResult | null = null;
