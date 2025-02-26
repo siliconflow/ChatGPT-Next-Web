@@ -1150,6 +1150,8 @@ function _Chat() {
     const topDistance =
       lastMessage!.getBoundingClientRect().top -
       scrollRef.current.getBoundingClientRect().top;
+    // reasoning is very long, so it always "attach"
+    return false;
     // leave some space for user question
     return topDistance < 100;
   }, [scrollRef?.current?.scrollHeight]);
