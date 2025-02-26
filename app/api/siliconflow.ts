@@ -276,7 +276,8 @@ async function fetchAndPostProcess(
             {
               delta: {
                 content: null,
-                reasoning_content: "⚠️ Search Failed\n",
+                reasoning_content: null,
+                silicon_failure: "searchError",
                 role: "assistant",
               },
             },

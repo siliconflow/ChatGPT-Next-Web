@@ -176,6 +176,7 @@ export class SiliconflowApi implements LLMApi {
                 content: string | null;
                 tool_calls: ChatMessageTool[];
                 reasoning_content: string | null;
+                silicon_failure?: "searchError" | undefined;
                 search_results: SearchResults | undefined;
                 search_indexes: SearchIndexes | undefined;
               };
@@ -185,6 +186,13 @@ export class SiliconflowApi implements LLMApi {
                 isThinking: false,
                 content: undefined,
                 shouldRecall: true,
+              };
+            }
+            if (choices[0].delta.silicon_failure == "searchError") {
+              return {
+                searchFailed: true,
+                isThinking: false,
+                content: undefined,
               };
             }
             if (!!choices[0].delta.search_indexes) {

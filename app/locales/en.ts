@@ -13,6 +13,7 @@ const en: LocaleType = {
       : `😆 Oops, there's an issue. Let's fix it:
      \ [Click here](/#/auth) to login 🔑
      `,
+    SearchFailed: "⚠️ Search Failed",
   },
   Auth: {
     Return: "Return",

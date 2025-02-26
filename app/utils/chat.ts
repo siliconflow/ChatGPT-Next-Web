@@ -389,6 +389,7 @@ export function streamWithThink(
   ) => {
     isThinking: boolean;
     content: string | undefined;
+    searchFailed?: boolean | undefined;
     shouldRecall?: boolean | undefined;
     search_results?: SearchResults | undefined;
     search_indexes?: SearchIndexes | undefined;
@@ -624,6 +625,11 @@ export function streamWithThink(
         }
         try {
           const chunk = parseSSE(text, runTools);
+          if (chunk.searchFailed) {
+            console.log("[Request] Search Failed");
+            remainTextSearch = Locale.Error.SearchFailed;
+            return;
+          }
           if (!!chunk.shouldRecall) {
             options.onRecall?.();
             recalled = true;
@@ -683,12 +689,6 @@ export function streamWithThink(
           // Check if thinking mode changed
           const isThinkingChanged = lastIsThinking !== chunk.isThinking;
           lastIsThinking = chunk.isThinking;
-
-          if (chunk.content.startsWith("⚠️ Search Failed")) {
-            console.log("[Request] Search Failed");
-            options.onUpdateSearch?.(chunk.content, chunk.content);
-            chunk.content = "";
-          }
 
           if (chunk.isThinking) {
             // If in thinking mode
