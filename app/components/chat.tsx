@@ -755,21 +755,23 @@ export function ChatActions(props: {
             icon={props.uploading ? <LoadingButtonIcon /> : <ImageIcon />}
           />
         )}
-        <ChatAction
-          onClick={nextTheme}
-          text={Locale.Chat.InputActions.Theme[theme]}
-          icon={
-            <>
-              {theme === Theme.Auto ? (
-                <AutoIcon />
-              ) : theme === Theme.Light ? (
-                <LightIcon />
-              ) : theme === Theme.Dark ? (
-                <DarkIcon />
-              ) : null}
-            </>
-          }
-        />
+        {!isMobileScreen && (
+          <ChatAction
+            onClick={nextTheme}
+            text={Locale.Chat.InputActions.Theme[theme]}
+            icon={
+              <>
+                {theme === Theme.Auto ? (
+                  <AutoIcon />
+                ) : theme === Theme.Light ? (
+                  <LightIcon />
+                ) : theme === Theme.Dark ? (
+                  <DarkIcon />
+                ) : null}
+              </>
+            }
+          />
+        )}
 
         <ChatAction
           onClick={props.showPromptHints}
@@ -1150,19 +1152,18 @@ function _Chat() {
     const topDistance =
       lastMessage!.getBoundingClientRect().top -
       scrollRef.current.getBoundingClientRect().top;
-    // reasoning is very long, so it always "attach"
-    return false;
     // leave some space for user question
     return topDistance < 100;
   }, [scrollRef?.current?.scrollHeight]);
 
   const isTyping = userInput !== "";
-
+  // reasoning is very long, so it always "attach"
+  const isAttachWithTopThinking = false;
   // if user is typing, should auto scroll to bottom
   // if user is not typing, should auto scroll to bottom only if already at bottom
   const { setAutoScroll, scrollDomToBottom } = useScrollToBottom(
     scrollRef,
-    (isScrolledToBottom || isAttachWithTop) && !isTyping,
+    (isScrolledToBottom || isAttachWithTopThinking) && !isTyping,
     session.messages,
   );
   const [hitBottom, setHitBottom] = useState(true);
