@@ -439,8 +439,12 @@ export function streamWithThink(
       return;
     }
 
+    const fetchFrequency = 30;
     if (remainTextSearch.length > 0) {
-      const fetchCount = Math.max(1, Math.round(remainTextSearch.length / 60));
+      const fetchCount = Math.max(
+        1,
+        Math.round(remainTextSearch.length / fetchFrequency),
+      );
       const fetchText = remainTextSearch.slice(0, fetchCount);
       responseTextSearch += fetchText;
       remainTextSearch = remainTextSearch.slice(fetchCount);
@@ -450,7 +454,7 @@ export function streamWithThink(
     if (remainTextSearch.length == 0 && remainTextThinking.length > 0) {
       const fetchCount = Math.max(
         1,
-        Math.round(remainTextThinking.length / 60),
+        Math.round(remainTextThinking.length / fetchFrequency),
       );
       const fetchText = remainTextThinking.slice(0, fetchCount);
       responseTextThinking += fetchText;
@@ -463,7 +467,10 @@ export function streamWithThink(
       remainTextThinking.length == 0 &&
       remainText.length > 0
     ) {
-      const fetchCount = Math.max(1, Math.round(remainText.length / 60));
+      const fetchCount = Math.max(
+        1,
+        Math.round(remainText.length / fetchFrequency),
+      );
       const fetchText = remainText.slice(0, fetchCount);
       responseText += fetchText;
       remainText = remainText.slice(fetchCount);
