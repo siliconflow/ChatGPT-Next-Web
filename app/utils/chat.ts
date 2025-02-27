@@ -193,7 +193,7 @@ export function stream(
     }
 
     if (remainText.length > 0) {
-      const fetchCount = Math.max(1, Math.round(remainText.length / 30));
+      const fetchCount = Math.max(1, Math.round(remainText.length / 60));
       const fetchText = remainText.slice(0, fetchCount);
       responseText += fetchText;
       remainText = remainText.slice(fetchCount);
