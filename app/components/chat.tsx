@@ -1558,8 +1558,12 @@ function _Chat() {
       setMsgRenderIndex(nextPageMsgIndex);
     }
 
+    // Use 20% of container height as the threshold
+    const relaxedThreshold = e.clientHeight * 0.2;
+    const isHitBottomRelaxed =
+      bottomHeight >= e.scrollHeight - relaxedThreshold;
     setHitBottom(isHitBottom);
-    setAutoScroll(isHitBottom);
+    setAutoScroll(isHitBottomRelaxed);
   };
 
   function scrollToBottom() {
