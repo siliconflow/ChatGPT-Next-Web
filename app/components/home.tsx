@@ -227,10 +227,16 @@ function Screen() {
             [styles["sidebar-show"]]: isHome,
           })}
         />
-        {showAuthModal && (
+        {isAuth ? (
           <AuthModal onClose={() => {}}>
-            {isStay ? <StayPage /> : <AuthPage />}
+            <StayPage />
           </AuthModal>
+        ) : (
+          showAuthModal && (
+            <AuthModal onClose={() => {}}>
+              {isStay ? <StayPage /> : <AuthPage />}
+            </AuthModal>
+          )
         )}
         <WindowContent>
           <Routes>
