@@ -146,7 +146,6 @@ const userInfoResponseExample = {
 };
 
 export async function allowSearch(Authorization: string): Promise<boolean> {
-  return true;
   if (getServerSideConfig().isConf) {
     console.log("conf mode, skipping credit check for search");
     return true;
@@ -159,10 +158,18 @@ export async function allowSearch(Authorization: string): Promise<boolean> {
     ).data;
     const chargeBalance = parseFloat(res.data.chargeBalance);
     const creditLimit = parseFloat(res.data.creditLimit);
-    return creditLimit > 0 || chargeBalance != 0;
-  } catch (error) {
-    console.error(error);
     return true;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        "fail to get user info:",
+        error.status,
+        error.response?.data,
+      );
+    } else {
+      console.error(error);
+    }
+    return false;
   }
 }
 
