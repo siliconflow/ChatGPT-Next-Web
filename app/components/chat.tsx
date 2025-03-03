@@ -1540,6 +1540,9 @@ function _Chat() {
     return renderMessages.slice(msgRenderIndex, endRenderIndex);
   }, [msgRenderIndex, renderMessages]);
 
+  const lastMessage = messages[messages.length - 1];
+  const lastMessageReceiving =
+    isLoading || (lastMessage?.role === "assistant" && !!lastMessage.streaming);
   const onChatBodyScroll = (e: HTMLElement) => {
     const bottomHeight = e.scrollTop + e.clientHeight;
     const edgeThreshold = e.clientHeight;
@@ -1563,7 +1566,7 @@ function _Chat() {
     const isHitBottomRelaxed =
       bottomHeight >= e.scrollHeight - relaxedThreshold;
     setHitBottom(isHitBottom);
-    setAutoScroll(isHitBottomRelaxed);
+    setAutoScroll(lastMessageReceiving && isHitBottomRelaxed);
   };
 
   function scrollToBottom() {
