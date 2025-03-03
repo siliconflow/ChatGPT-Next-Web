@@ -108,7 +108,7 @@ import {
   DEFAULT_TTS_ENGINE,
   ModelProvider,
   Path,
-  REQUEST_TIMEOUT_MS,
+  REQUEST_TIMEOUT_MS_FOR_THINKING,
   ServiceProvider,
   UNFINISHED_INPUT,
 } from "../constant";
@@ -1285,7 +1285,7 @@ function _Chat() {
 
   useEffect(() => {
     chatStore.updateTargetSession(session, (session) => {
-      const stopTiming = Date.now() - REQUEST_TIMEOUT_MS;
+      const stopTiming = Date.now() - REQUEST_TIMEOUT_MS_FOR_THINKING;
       session.messages.forEach((m) => {
         // check if should stop all stale messages
         if (m.isError || new Date(m.date).getTime() < stopTiming) {
