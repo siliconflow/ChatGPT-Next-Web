@@ -6,7 +6,7 @@ on:
     types: [published]
   push:
     branches:
-      - main
+      - dev
 env:
   REGION_ID: cn-beijing
   REGISTRY: registry.cn-beijing.aliyuncs.com
