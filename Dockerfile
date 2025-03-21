@@ -3,9 +3,10 @@ FROM node:18-alpine AS base
 FROM base AS deps
 
 RUN apk add --no-cache libc6-compat curl bash
+ENV BUN_INSTALL="/root/.bun"
+ENV PATH="$BUN_INSTALL/bin:$PATH"
 RUN curl -fsSL https://bun.sh/install | bash && \
-    export BUN_INSTALL="/root/.bun" && \
-    export PATH="$BUN_INSTALL/bin:$PATH"
+    bun --version
 
 WORKDIR /app
 
