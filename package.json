@@ -3,20 +3,20 @@
   "private": false,
   "license": "mit",
   "scripts": {
-    "mask": "npx tsx app/masks/build.ts",
-    "mask:watch": "npx watch \"yarn mask\" app/masks",
-    "dev": "concurrently -r \"yarn run mask:watch\" \"next dev\"",
-    "build": "yarn mask && cross-env BUILD_MODE=standalone next build",
+    "mask": "bunx tsx app/masks/build.ts",
+    "mask:watch": "bunx watch \"bun run mask\" app/masks",
+    "dev": "concurrently -r \"bun run mask:watch\" \"next dev\"",
+    "build": "bun run mask && cross-env BUILD_MODE=standalone next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "yarn mask && cross-env BUILD_MODE=export BUILD_APP=1 next build",
-    "export:dev": "concurrently -r \"yarn mask:watch\"  \"cross-env BUILD_MODE=export BUILD_APP=1 next dev\"",
-    "app:dev": "concurrently -r \"yarn mask:watch\" \"yarn tauri dev\"",
-    "app:build": "yarn mask && yarn tauri build",
-    "app:clear": "yarn tauri dev",
-    "prompts": "node ./scripts/fetch-prompts.mjs",
+    "export": "bun run mask && cross-env BUILD_MODE=export BUILD_APP=1 next build",
+    "export:dev": "concurrently -r \"bun run mask:watch\"  \"cross-env BUILD_MODE=export BUILD_APP=1 next dev\"",
+    "app:dev": "concurrently -r \"bun run mask:watch\" \"bun run tauri dev\"",
+    "app:build": "bun run mask && bun run tauri build",
+    "app:clear": "bun run tauri dev",
+    "prompts": "bunx ./scripts/fetch-prompts.mjs",
     "prepare": "husky install",
-    "proxy-dev": "sh ./scripts/init-proxy.sh && proxychains -f ./scripts/proxychains.conf yarn dev",
+    "proxy-dev": "sh ./scripts/init-proxy.sh && proxychains -f ./scripts/proxychains.conf bun run dev",
     "test": "jest --watch",
     "test:ci": "jest --ci"
   },
@@ -91,8 +91,5 @@
     "watch": "^1.0.2",
     "webpack": "^5.88.1"
   },
-  "resolutions": {
-    "lint-staged/yaml": "^2.2.2"
-  },
-  "packageManager": "yarn@1.22.19"
+  "packageManager": "bun@1.2.4"
 }
