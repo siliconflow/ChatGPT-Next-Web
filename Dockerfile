@@ -1,15 +1,14 @@
-FROM node:18-alpine AS base
+FROM oven/bun:1-alpine AS base
 
 FROM base AS deps
 
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat curl bash
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY package.json bun.lock ./
 
-RUN yarn config set registry 'https://registry.npmmirror.com/'
-RUN yarn install
+RUN bun install --frozen-lockfile
 
 FROM base AS builder
 ARG NEXT_PUBLIC_SF_NEXT_CHAT_CLIENT_ID
@@ -24,7 +23,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN yarn build
+RUN bun run build
 
 FROM base AS runner
 WORKDIR /app

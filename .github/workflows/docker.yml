@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - dev
+      - bun
 env:
   REGION_ID: cn-beijing
   REGISTRY: registry.cn-beijing.aliyuncs.com
@@ -56,7 +57,7 @@ jobs:
             NEXT_PUBLIC_SF_NEXT_CHAT_CLIENT_ID=${{ vars.NEXT_PUBLIC_SF_NEXT_CHAT_CLIENT_ID }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/next-chat-sf
-            oneflowinc/silicon-chat:latest
+            oneflowinc/silicon-chat:latest-bun
             oneflowinc/silicon-chat:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
