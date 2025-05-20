@@ -702,36 +702,42 @@ export function ChatActions(props: {
             icon={<StopIcon />}
           />
         )}
-        <ChatActionFull
-          icon={<ProIcon />}
-          onClick={() => {
-            const newPro = !isPro;
-            setPro(newPro);
-            updateModel(isDeepThinking, newPro, isSearch);
-          }}
-          text={"Pro"}
-          active={isPro}
-        />
-        <ChatActionFull
-          icon={<ThinkIcon />}
-          onClick={() => {
-            const newDeepThinking = !isDeepThinking;
-            setDeepThinking(newDeepThinking);
-            updateModel(newDeepThinking, isPro, isSearch);
-          }}
-          text={isMobileScreen ? "思考" : "深度思考"}
-          active={isDeepThinking}
-        />
-        <ChatActionFull
-          icon={<SearchIcon />}
-          onClick={() => {
-            const newSearch = !isSearch;
-            setSearch(newSearch);
-            updateModel(isDeepThinking, isPro, newSearch);
-          }}
-          text={isMobileScreen ? "联网" : "联网搜索"}
-          active={isSearch}
-        />
+        {!accessStore.isConfMode() && (
+          <ChatActionFull
+            icon={<ProIcon />}
+            onClick={() => {
+              const newPro = !isPro;
+              setPro(newPro);
+              updateModel(isDeepThinking, newPro, isSearch);
+            }}
+            text={"Pro"}
+            active={isPro}
+          />
+        )}
+        {!accessStore.isConfMode() && (
+          <ChatActionFull
+            icon={<ThinkIcon />}
+            onClick={() => {
+              const newDeepThinking = !isDeepThinking;
+              setDeepThinking(newDeepThinking);
+              updateModel(newDeepThinking, isPro, isSearch);
+            }}
+            text={isMobileScreen ? "思考" : "深度思考"}
+            active={isDeepThinking}
+          />
+        )}
+        {!accessStore.isConfMode() && (
+          <ChatActionFull
+            icon={<SearchIcon />}
+            onClick={() => {
+              const newSearch = !isSearch;
+              setSearch(newSearch);
+              updateModel(isDeepThinking, isPro, newSearch);
+            }}
+            text={isMobileScreen ? "联网" : "联网搜索"}
+            active={isSearch}
+          />
+        )}
         {!props.hitBottom && (
           <ChatAction
             onClick={props.scrollToBottom}
