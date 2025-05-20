@@ -182,11 +182,11 @@ function Screen() {
     const sub = useAccessStore.subscribe((state, prevState) => {
       if (
         state.siliconflowApiKey !== prevState.siliconflowApiKey ||
-        state.isConfMode !== prevState.isConfMode
+        state.isConf !== prevState.isConf
       ) {
         console.log("SiliconFlow API Key may change");
-        console.log("isConf may change", state.isConfMode);
-        setShowAuthModal(!state.isConfMode && !state.siliconflowApiKey);
+        console.log("isConf may change", state.isConf);
+        setShowAuthModal(!state.isConf && !state.siliconflowApiKey);
       }
     });
     setShowAuthModal(
