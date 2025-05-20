@@ -285,6 +285,7 @@ export function SideBar(props: { className?: string }) {
               }
               window.open(SiliconFlow.VerificationPath, "_blank");
             }}
+            hidden={accessStore.isConfMode()}
             shadow
           />
           <IconButton
@@ -298,6 +299,7 @@ export function SideBar(props: { className?: string }) {
               }
               window.open(SiliconFlow.BillPath, "_blank");
             }}
+            hidden={accessStore.isConfMode()}
             shadow
           />
           <IconButton
