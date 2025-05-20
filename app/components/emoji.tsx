@@ -6,8 +6,7 @@ import EmojiPicker, {
 } from "emoji-picker-react";
 
 import { customEmojisMaaS, ModelType } from "../store";
-
-import BotIconDefault from "../icons/llm-icons/default.svg";
+import BotIconDefault from "../icons/logo.svg";
 import BotIconOpenAI from "../icons/llm-icons/openai.svg";
 import BotIconGemini from "../icons/llm-icons/gemini.svg";
 import BotIconGemma from "../icons/llm-icons/gemma.svg";

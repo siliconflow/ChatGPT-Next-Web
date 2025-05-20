@@ -2035,8 +2035,10 @@ function _Chat() {
                                     <MaskAvatar
                                       avatar={session.mask.avatar}
                                       model={
-                                        message.model ||
-                                        session.mask.modelConfig.model
+                                        accessStore.isConfMode()
+                                          ? "???"
+                                          : message.model ||
+                                            session.mask.modelConfig.model
                                       }
                                     />
                                   )}
@@ -2044,7 +2046,10 @@ function _Chat() {
                               )}
                             </div>
                             {!isUser && (
-                              <div className={styles["chat-model-name"]}>
+                              <div
+                                className={styles["chat-model-name"]}
+                                hidden={accessStore.isConfMode()}
+                              >
                                 {message.model}
                               </div>
                             )}
