@@ -269,11 +269,7 @@ export const SiliconFlow = {
   BillPath: "https://cloud.siliconflow.cn/expensebill",
   InternationalHomePage: "https://siliconflow.com",
   VerificationPath: "https://cloud.siliconflow.cn/account/authentication",
-  SummaryModels: [
-    "Qwen/Qwen2.5-7B-Instruct",
-    "THUDM/glm-4-9b-chat",
-    "internlm/internlm2_5-7b-chat",
-  ],
+  SummaryModels: ["Qwen3-8B"],
 };
 
 export const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
