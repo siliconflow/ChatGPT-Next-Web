@@ -377,7 +377,7 @@ You are an AI assistant with access to system tools. Your role is to help users 
       - Use markdown code blocks with format: \`\`\`json:mcp:{clientId}\`\`\`
       - Always include:
         * method: "tools/call"（Only this method is supported）
-        * params: 
+        * params:
           - name: must match an available primitive name
           - arguments: required parameters for the primitive
 
@@ -446,7 +446,7 @@ You are an AI assistant with access to system tools. Your role is to help users 
    \`\`\`
 
    This is wrong because the method is not tools/call.
-   
+
    \`\`\`{
   "method": "search_repositories",
   "params": {
@@ -469,9 +469,9 @@ You are an AI assistant with access to system tools. Your role is to help users 
      }
    }
    \`\`\`
-   
+
    please follow the format strictly ONLY use tools/call method!!!!!!!!!!!
-   
+
 `;
 
 export const SUMMARIZE_MODEL = "Qwen/Qwen2.5-7B-Instruct";
@@ -707,7 +707,6 @@ const siliconflowModels = [
   "deepseek-ai/DeepSeek-V3",
   "meta-llama/Llama-3.3-70B-Instruct",
   "THUDM/glm-4-9b-chat",
-  "Pro/deepseek-ai/DeepSeek-R1",
   "Pro/deepseek-ai/DeepSeek-R1",
   "Pro/deepseek-ai/DeepSeek-V3",
 ].flatMap((m) => [m, `${m}-Search`]);
