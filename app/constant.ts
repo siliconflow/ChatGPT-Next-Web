@@ -705,9 +705,11 @@ const siliconflowModels = [
   "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
   "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
   "deepseek-ai/DeepSeek-V3",
+  "deepseek-ai/DeepSeek-V3.1",
   "meta-llama/Llama-3.3-70B-Instruct",
   "THUDM/glm-4-9b-chat",
   "Pro/deepseek-ai/DeepSeek-R1",
+  "Pro/deepseek-ai/DeepSeek-V3",
   "Pro/deepseek-ai/DeepSeek-V3.1",
 ].flatMap((m) => [m, `${m}-Search`]);
 
