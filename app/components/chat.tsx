@@ -660,7 +660,7 @@ export function ChatActions(props: {
       );
     }
   }, [chatStore, currentModel, models, session]);
-  const v3 = "deepseek-ai/DeepSeek-V3.1";
+  const v3 = "deepseek-ai/DeepSeek-V3";
   const r1 = "deepseek-ai/DeepSeek-R1";
   const appConfig = useAppConfig();
   const initModel = session.mask.modelConfig.model;
